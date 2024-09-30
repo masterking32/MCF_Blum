@@ -8,6 +8,8 @@ import os
 from .core.HttpRequest import HttpRequest
 from .core.Auth import Auth
 from .core.User import User
+from .core.Game import Game
+from .core.Wallet import Wallet
 
 MasterCryptoFarmBot_Dir = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__ + "/../../"))
@@ -66,9 +68,6 @@ class FarmBot:
             user = User(self.log, self.http, self.account_name)
             user_info = user.get_me()
             if user_info is None or "id" not in user_info:
-                self.log.error(
-                    f"<r>⭕ {self.display_name} failed to get user info!</r>"
-                )
                 return
 
             user_id = user_info.get("id").get("id", 0)
@@ -77,6 +76,33 @@ class FarmBot:
             self.log.info(
                 f"<g>👤 User info for <c>{self.display_name}</c>: ID: <c>{hide_text(user_id, 2)}</c>, Username: <c>{hide_text(username, 3)}</c></g>"
             )
+
+            game = Game(self.log, self.http, self.account_name)
+            now = game.get_now()
+            if now is None:
+                return
+
+            balance = game.get_balance()
+            if balance is None:
+                return
+
+            available_balance = balance.get("availableBalance", 0).split(".")[0]
+            play_passes = balance.get("playPasses")
+
+            self.log.info(
+                f"<g>💰 Balance for <c>{self.display_name}</c>: Available balance: <c>{available_balance}</c> Ḅ, Play passes: <c>{play_passes}</c> 🎮</g>"
+            )
+
+            wallet = Wallet(self.log, self.http, self.account_name)
+            wallet_info = wallet.get_my()
+            if wallet_info is None:
+                self.log.info(
+                    f"<y>💳 The wallet is not connected to {self.display_name}</y>"
+                )
+            else:
+                self.log.info(
+                    f"<g>💳 The wallet is connected to {self.display_name}</g>"
+                )
 
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to login!</r>")

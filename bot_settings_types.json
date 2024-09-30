@@ -32,32 +32,6 @@
     "description": "Should the bot automatically do tasks for you?"
   },
   {
-    "key": "tribe_id",
-    "name": "Tribe ID",
-    "type": "text",
-    "placeholder": "Tribe ID (NOT NAME!)",
-    "default_value": "",
-    "description": "Only change this if you know what you're doing! You must put the ID of the tribe you want to join, not the name! For example this is DOG's ID: 0999c4b7-1bbd-4825-a7a0-afc1bfb3fff6"
-  },
-  {
-    "key": "start_delay_min",
-    "name": "Minimum delay before starting (minutes)",
-    "type": "range",
-    "default_value": 1,
-    "description": "Minimum delay before starting \"each\" account, in minutes.",
-    "min": 1,
-    "max": 5
-  },
-  {
-    "key": "start_delay_max",
-    "name": "Maximum delay before starting (minutes)",
-    "type": "range",
-    "default_value": 5,
-    "description": "Maximum delay before starting \"each\" account, in minutes.",
-    "min": 5,
-    "max": 10
-  },
-  {
     "key": "check_interval",
     "name": "Check interval (seconds)",
     "type": "number",

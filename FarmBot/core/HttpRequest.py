@@ -54,6 +54,7 @@ class HttpRequest:
         auth_header=True,
         return_headers=False,
         retries=3,
+        display_errors=True,
     ):
         try:
             url = self._fix_url(url, domain)
@@ -101,9 +102,10 @@ class HttpRequest:
                     BL.delete_auth_token(self.account_name)
                     return (None, None) if return_headers else None
             elif response.status_code != valid_response_code:
-                self.log.error(
-                    f"🔴 <red> GET Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
-                )
+                if display_errors:
+                    self.log.error(
+                        f"🔴 <red> GET Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
+                    )
                 return (None, None) if return_headers else None
 
             return (
@@ -125,9 +127,10 @@ class HttpRequest:
                     auth_header,
                     return_headers,
                     retries - 1,
+                    display_errors,
                 )
-
-            self.log.error(f"🔴 <red> GET Request Error: <y>{url}</y> {e}</red>")
+            if display_errors:
+                self.log.error(f"🔴 <red> GET Request Error: <y>{url}</y> {e}</red>")
             return (None, None) if return_headers else None
 
     def post(
