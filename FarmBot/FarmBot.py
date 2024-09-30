@@ -5,7 +5,8 @@
 import sys
 import os
 
-import utilities.utilities as utilities
+from .core.HttpRequest import HttpRequest
+from .core.Auth import Auth
 
 MasterCryptoFarmBot_Dir = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__ + "/../../"))
@@ -31,20 +32,26 @@ class FarmBot:
         self.log = log
         self.bot_globals = bot_globals
         self.account_name = account_name
+        self.display_name = None
         self.web_app_query = web_app_query
         self.proxy = proxy
         self.user_agent = user_agent
         self.isPyrogram = isPyrogram
         self.tgAccount = tgAccount
+        self.http = None
 
     async def run(self):
+        self.display_name = self.account_name.replace("ma_", "")
         self.log.info(
-            f"<g>🤖 Farming is starting for account <cyan>{self.account_name}</cyan>...</g>"
+            f"<g>🤖 Starting Blum farming for account <cyan>{self.display_name}</cyan>...</g>"
         )
 
-        # If self.tg is not None, it means you can use Pyrogram...
-        self.log.info(
-            f"<blue>[Development Only] URL: <c>{self.web_app_query}</c></blue>"
-        )
+        try:
+            self.http = HttpRequest(self.log, self.proxy, self.user_agent)
+            auth = Auth(self.log, self.http, self.account_name, self.web_app_query)
+            access_token, refresh_token = auth.login()
 
-        # Login and other codes here ...
+        except Exception as e:
+            self.log.error(f"<r>⭕ {e} failed to login!</r>")
+            self.log.error(f"<r>⭕ {self.display_name} failed to login!</r>")
+            return None, None

@@ -1,79 +1,69 @@
 [
   {
-    "key": "key1",
-    "name": "Example Text",
-    "type": "text",
-    "placeholder": "Text Placeholder",
-    "default_value": "Default Text",
-    "description": "This is an example text field",
-    "required": false
-  },
-  {
-    "key": "key_number",
-    "name": "Example Number",
-    "type": "number",
-    "placeholder": "Number Placeholder",
-    "default_value": 1,
-    "description": "This is an example number field",
+    "key": "game_points_min",
+    "name": "Minimum Claim Points (Game)",
+    "type": "range",
+    "default_value": 175,
+    "description": "Minimum claim points for games, it will be randomized between Minimum and Maximum.",
     "min": 1,
-    "max": 255
+    "max": 220
   },
   {
-    "key": "key_checkbox1",
-    "name": "Example Checkbox",
+    "key": "game_points_max",
+    "name": "Maximum Claim Points (Game)",
+    "type": "range",
+    "default_value": 220,
+    "description": "Maximum claim points for games, it will be randomized between Minimum and Maximum.",
+    "min": 1,
+    "max": 250
+  },
+  {
+    "key": "game_enabled",
+    "name": "Auto Play Games",
     "type": "checkbox",
     "default_value": "on",
-    "description": "This is an example checkbox field"
+    "description": "Should the bot automatically play games for you?"
   },
   {
-    "key": "key_range1",
-    "name": "Example Range",
+    "key": "task_enabled",
+    "name": "Auto Claim Tasks",
+    "type": "checkbox",
+    "default_value": "on",
+    "description": "Should the bot automatically do tasks for you?"
+  },
+  {
+    "key": "tribe_id",
+    "name": "Tribe ID",
+    "type": "text",
+    "placeholder": "Tribe ID (NOT NAME!)",
+    "default_value": "",
+    "description": "Only change this if you know what you're doing! You must put the ID of the tribe you want to join, not the name! For example this is DOG's ID: 0999c4b7-1bbd-4825-a7a0-afc1bfb3fff6"
+  },
+  {
+    "key": "start_delay_min",
+    "name": "Minimum delay before starting (minutes)",
     "type": "range",
-    "default_value": 50,
-    "description": "This is an example range field",
-    "min": 50,
-    "max": 100
+    "default_value": 1,
+    "description": "Minimum delay before starting \"each\" account, in minutes.",
+    "min": 1,
+    "max": 5
   },
   {
-    "key": "key_select1",
-    "name": "Example Select",
-    "type": "select",
-    "options": [
-      {
-        "value": "option1",
-        "name": "Option 1"
-      },
-      {
-        "value": "option2",
-        "name": "Option 2"
-      }
-    ],
-    "description": "This is an example select field",
-    "multi_select": false
+    "key": "start_delay_max",
+    "name": "Maximum delay before starting (minutes)",
+    "type": "range",
+    "default_value": 5,
+    "description": "Maximum delay before starting \"each\" account, in minutes.",
+    "min": 5,
+    "max": 10
   },
   {
-    "key": "key_select2",
-    "name": "Example Multi-Select",
-    "type": "select",
-    "options": [
-      {
-        "value": "option1",
-        "name": "Option 1"
-      },
-      {
-        "value": "option2",
-        "name": "Option 2"
-      },
-      {
-        "value": "option3",
-        "name": "Option 3"
-      },
-      {
-        "value": "option4",
-        "name": "Option 4"
-      }
-    ],
-    "description": "This is an example select field",
-    "multi_select": true
+    "key": "check_interval",
+    "name": "Check interval (seconds)",
+    "type": "number",
+    "default_value": 3600,
+    "description": "How often to login into accounts, in seconds.",
+    "min": 1800,
+    "max": 28800
   }
 ]
