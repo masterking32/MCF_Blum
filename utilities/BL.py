@@ -26,7 +26,10 @@ def read_json_file(json_file, default=None):
         return default
 
 
-def save_auth_token(session_name, access_token, refresh_token):
+def save_auth_token(session_name, access_token=None, refresh_token=None):
+    if session_name is None:
+        return False
+
     try:
         json_file = os.path.join(MODULE_DIR, "tokens.json")
         data = read_json_file(json_file, {})
@@ -36,11 +39,29 @@ def save_auth_token(session_name, access_token, refresh_token):
         }
         with open(json_file, "w") as f:
             json.dump(data, f, indent=4)
+
+        return True
     except Exception as e:
-        pass
+        return False
 
 
 def get_auth_token(session_name):
-    json_file = os.path.join(MODULE_DIR, "tokens.json")
-    data = read_json_file(json_file, {})
-    return data.get(session_name, {})
+    try:
+        json_file = os.path.join(MODULE_DIR, "tokens.json")
+        data = read_json_file(json_file, {})
+        return data.get(session_name, {})
+    except Exception as e:
+        return {}
+
+
+def delete_auth_token(session_name):
+    try:
+        json_file = os.path.join(MODULE_DIR, "tokens.json")
+        data = read_json_file(json_file, {})
+        if session_name in data:
+            del data[session_name]
+            with open(json_file, "w") as f:
+                json.dump(data, f, indent=4)
+        return True
+    except Exception as e:
+        return False

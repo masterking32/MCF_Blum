@@ -3,8 +3,10 @@
 # Github: https://github.com/masterking32
 # Telegram: https://t.me/MasterCryptoFarmBot
 
+import json
 import time
 import requests
+import utilities.BL as BL
 
 
 class HttpRequest:
@@ -13,6 +15,8 @@ class HttpRequest:
         log,
         proxy=None,
         user_agent=None,
+        tgWebData=None,
+        account_name=None,
     ):
         self.log = log
         self.proxy = proxy
@@ -28,6 +32,8 @@ class HttpRequest:
         }
         self.authToken = None
         self.RefreshToken = None
+        self.tgWebData = tgWebData
+        self.account_name = account_name
 
         if not self.user_agent or self.user_agent == "":
             self.user_agent = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Mobile Safari/537.3"
@@ -72,7 +78,29 @@ class HttpRequest:
                 proxies=self._get_proxy(),
             )
 
-            if response.status_code != valid_response_code:
+            if response.status_code == 401:
+                if self.renew_access_token():
+                    self.log.info(
+                        "🟡 <y>Retrying previous request after renewing the access token...</y>"
+                    )
+                    BL.save_auth_token(
+                        self.account_name, self.authToken, self.RefreshToken
+                    )
+                    return self.get(
+                        url,
+                        domain,
+                        headers,
+                        send_option_request,
+                        valid_response_code,
+                        valid_option_response_code,
+                        auth_header,
+                        return_headers,
+                        retries,
+                    )
+                else:
+                    BL.delete_auth_token(self.account_name)
+                    return (None, None) if return_headers else None
+            elif response.status_code != valid_response_code:
                 self.log.error(
                     f"🔴 <red> GET Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
                 )
@@ -147,7 +175,30 @@ class HttpRequest:
                     proxies=self._get_proxy(),
                 )
 
-            if response.status_code != valid_response_code:
+            if response.status_code == 401:
+                if self.renew_access_token():
+                    self.log.info(
+                        "🟡 <y>Retrying request after renewing access token...</y>"
+                    )
+                    BL.save_auth_token(
+                        self.account_name, self.authToken, self.RefreshToken
+                    )
+                    return self.post(
+                        url,
+                        domain,
+                        data,
+                        headers,
+                        send_option_request,
+                        valid_response_code,
+                        valid_option_response_code,
+                        auth_header,
+                        return_headers,
+                        retries,
+                    )
+                else:
+                    BL.delete_auth_token(self.account_name)
+                    return (None, None) if return_headers else None
+            elif response.status_code != valid_response_code:
                 self.log.error(
                     f"🔴 <red> POST Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
                 )
@@ -297,3 +348,50 @@ class HttpRequest:
             )
 
         return default_headers
+
+    def renew_access_token(self):
+        self.log.info("🟡 <y>Renewing access token...</y>")
+
+        headers = self._get_default_headers()
+        url = self._fix_url("/api/v1/auth/refresh", "user")
+        option_headers = self._get_get_option_headers(headers, "POST")
+        option_headers["access-control-request-headers"] = "content-type,lang"
+        proxy = self._get_proxy()
+
+        option_response = requests.options(
+            url=url,
+            headers=option_headers,
+            proxies=proxy,
+        )
+
+        if option_response.status_code != 204:
+            self.log.error(
+                f"🔴 <red> OPTIONS Request Error: <y>{url}</y> Response code: {option_response.status_code}</red>"
+            )
+            return False
+
+        response = requests.post(
+            url=url,
+            headers=headers,
+            data=json.dumps({"refresh": self.RefreshToken}),
+            proxies=proxy,
+        )
+
+        if response.status_code != 200:
+            self.log.error(
+                f"🔴 <red> POST Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
+            )
+            return False
+
+        response = response.json()
+        access_token = response.get("access")
+        refresh_token = response.get("refresh")
+
+        if not access_token:
+            self.log.error("🔴 <red>Failed to renew access token</red>")
+            return False
+
+        self.authToken = access_token
+        self.RefreshToken = refresh_token
+        self.log.info("🟢 <g>Access token renewed successfully</g>")
+        return True
