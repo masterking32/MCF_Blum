@@ -11,6 +11,7 @@ from .core.Auth import Auth
 from .core.User import User
 from .core.Game import Game
 from .core.Wallet import Wallet
+from .core.Tribe import Tribe
 
 MasterCryptoFarmBot_Dir = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__ + "/../../"))
@@ -83,12 +84,12 @@ class FarmBot:
             if now is None:
                 return
 
-            balance = game.get_balance()
-            if balance is None:
+            game_balance = game.get_balance()
+            if game_balance is None:
                 return
 
-            available_balance = balance.get("availableBalance", 0).split(".")[0]
-            play_passes = balance.get("playPasses")
+            available_balance = game_balance.get("availableBalance", 0).split(".")[0]
+            play_passes = game_balance.get("playPasses")
 
             self.log.info(
                 f"<g>💰 Balance for <c>{self.display_name}</c>: Available balance: <c>{available_balance}</c> Ḅ, Play passes: <c>{play_passes}</c> 🎮</g>"
@@ -109,7 +110,7 @@ class FarmBot:
             daily_reward = game.get_daily_reward(tz_offset)
             if daily_reward is None:
                 self.log.info(
-                    f"<y>🎁 Daily reward for <c>{self.display_name}</c> is not available</y>"
+                    f"<g>🎁 Daily reward for <c>{self.display_name}</c> is not available</g>"
                 )
             elif "days" in daily_reward:
                 day_1 = daily_reward.get("days", [])
@@ -137,6 +138,18 @@ class FarmBot:
             if wallet_balance is None:
                 return
 
+            tribe = Tribe(self.log, self.http, self.account_name)
+            tribe_my = tribe.get_my()
+            if tribe_my is None:
+                self.log.info(
+                    f"<y>🏞️ The tribe is not connected to {self.display_name}</y>"
+                )
+            else:
+                tribe_title = tribe_my.get("title", "")
+                self.log.info(
+                    f"<g>🏞️ The tribe is connected to {self.display_name}: <c>{tribe_title}</c></g>"
+                )
+
             user_invites = user_balance.get("usedInvitation", 0)
             user_amountForClaim = 0
             try:
@@ -160,11 +173,21 @@ class FarmBot:
                         f"<g>👥 Claimed <c>{user_amountForClaim}</c> invites, new balance: <c>{user_amountForClaim} Ḅ</c></g>"
                     )
 
-                    user_balance = wallet.get_balance()
+                    user_balance = user.get_balance()
                     if user_balance is not None:
-                        user_invites = user_balance.get("usedInvitation", 0)
-                        user_amountForClaim = 0
+                        user_balance = user_balance.get("balance", 0)
 
+            game_balance = game.get_balance()
+            if game_balance is not None:
+                available_balance = game_balance.get("availableBalance", 0)
+                play_passes = game_balance.get("playPasses", 0)
+
+            leaderboard = tribe.get_leaderboard()
+            if tribe_my is None and leaderboard is not None:
+                self.log.info(
+                    f"<g>🏞️ Try to join a tribe for </g><c>{self.display_name}</c>"
+                )
+                tribe.join_tribe(leaderboard)
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to login!</r>")
             self.log.error(f"<r>⭕ {self.display_name} failed to login!</r>")
