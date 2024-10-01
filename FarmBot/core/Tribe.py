@@ -170,8 +170,10 @@ class Tribe:
                 return None
 
             self.log.info(
-                f"<g>🏞️ {self.account_name} joined the tribe: <c>{my_tribe.get('title', '')}</c></g>"
+                f"🏞️ <c>{self.account_name}</c><g> joined the tribe: </g><c>{my_tribe.get('title', '')}</c>"
             )
+
+            return True
 
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to join tribe!</r>")

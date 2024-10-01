@@ -84,3 +84,19 @@ class Game:
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to get daily reward!</r>")
             return None
+
+    def start_farming(self):
+        try:
+            response = self.http.post(
+                url="/api/v1/farming/start",
+                domain="game",
+            )
+
+            if response is None:
+                return None
+
+            return response
+
+        except Exception as e:
+            self.log.error(f"<r>⭕ {e} failed to start farming!</r>")
+            return None

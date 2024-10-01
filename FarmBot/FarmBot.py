@@ -18,7 +18,7 @@ MasterCryptoFarmBot_Dir = os.path.dirname(
 )
 sys.path.append(MasterCryptoFarmBot_Dir)
 
-from utils.utils import hide_text
+from mcf_utils.utils import hide_text
 
 
 class FarmBot:
@@ -188,6 +188,16 @@ class FarmBot:
                     f"<g>🏞️ Try to join a tribe for </g><c>{self.display_name}</c>"
                 )
                 tribe.join_tribe(leaderboard)
+
+            if game_balance.get("farming") and int(
+                game_balance.get("farming").get("endTime", 0)
+            ) < int(game_balance.get("timestamp", 0)):
+                print("|CCCCCCvCCCCCC|")
+            if game_balance.get("farming") is None:
+                game.start_farming()
+                self.log.info(
+                    f"<g>🌾 Farming started for <c>{self.display_name}</c></g>"
+                )
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to login!</r>")
             self.log.error(f"<r>⭕ {self.display_name} failed to login!</r>")
