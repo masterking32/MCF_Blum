@@ -4,8 +4,11 @@
 # Telegram: https://t.me/MasterCryptoFarmBot
 
 
-from random import random
+import json
+import random
+from utilities.utilities import getConfig
 import time
+from .Wallet import Wallet
 
 
 class Game:
@@ -138,22 +141,45 @@ class Game:
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to send play passes!</r>")
 
+    def claim_game(self, gameId, points):
+        try:
+            response = self.http.post(
+                url="/api/v1/game/claim",
+                data=json.dumps({"gameId": gameId, "points": points}),
+                domain="game",
+                only_json_response=False,
+            )
+
+            if response is None:
+                self.log.error(f"<r>⭕ {self.account_name} failed to claim game!</r>")
+                return None
+
+            return response
+
+        except Exception as e:
+            self.log.error(f"<r>⭕ {e} failed to claim game!</r>")
+            return
+
     def play_passes(self, games_count):
         try:
             if games_count == 0:
                 return None
+
+            games_count_to_play = random.randint(1, min(games_count, 5))
             self.log.info(
-                f"<g>🎮 Playing {games_count} games for {self.account_name} ...</g>"
+                f"<g>🎮 We are playing <c>{games_count_to_play}</c> games of <c>{games_count}</c> your games for <c>{self.account_name}</c> ...</g>"
             )
-            for _ in range(games_count):
-                random_sleep = random.randint(3, 10)
+            wallet = Wallet(self.log, self.http, self.account_name)
+            for _ in range(games_count_to_play):
+                self.get_balance()
+                wallet.get_balance()
+                self.get_now()
+                random_sleep = random.randint(1, 5)
                 self.log.info(
                     f"<g>🎮 Waiting <c>{random_sleep}</c> seconds before starting a game ...</g>"
                 )
 
                 time.sleep(random_sleep)
-                self.get_balance()
-                self.get_now()
 
                 game_play_request = self.play_game()
                 if game_play_request is None:
@@ -163,11 +189,54 @@ class Game:
                     return None
 
                 gameId = game_play_request.get("gameId")
-                random_sleep = random.randint(30, 40)
+                random_sleep = random.randint(30, 38)
 
                 self.log.info(
                     f"<g>🎮 Game started, waiting for <c>{random_sleep}</c> seconds ...</g>"
                 )
+
+                sleep_time = random_sleep / 3
+                time.sleep(sleep_time)
+                self.get_balance()
+                wallet.get_balance()
+                time.sleep(sleep_time)
+                self.get_balance()
+                wallet.get_balance()
+                time.sleep(sleep_time)
+
+                points = random.randint(
+                    min(
+                        getConfig("game_points_min", 150),
+                        getConfig("game_points_max", 220),
+                    ),
+                    max(
+                        getConfig("game_points_min", 150),
+                        getConfig("game_points_max", 220),
+                    ),
+                )
+
+                game_claim_request = self.claim_game(gameId, points)
+                if game_claim_request is None:
+                    self.log.error(
+                        f"<r>⭕ {self.account_name} failed to claim game!</r>"
+                    )
+                    return None
+
+                self.log.info(
+                    f"<g>🎮 Game claimed successfully, points: (<c>+{points}Ḅ</c>)</g>"
+                )
+
+            balance = self.get_balance()
+            if balance is None:
+                return True
+            wallet.get_balance()
+            self.get_now()
+
+            available_balance = balance.get("availableBalance", 0).split(".")[0]
+            play_passes = balance.get("playPasses", 0)
+            self.log.info(
+                f"<g>💰 Balance for <c>{self.account_name}</c>: Available balance: <c>{available_balance}Ḅ</c>, Play passes: <c>{play_passes}</c> 🎮</g>"
+            )
 
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to play passes!</r>")

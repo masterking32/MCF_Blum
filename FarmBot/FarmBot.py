@@ -83,8 +83,8 @@ class FarmBot:
 
             game = Game(self.log, self.http, self.account_name)
             now = game.get_now()
-            # if now is None:
-            #     return
+            if now is None:
+                return
 
             game_balance = game.get_balance()
             if game_balance is None:
@@ -221,7 +221,6 @@ class FarmBot:
 
             if getConfig("game_enabled", True) and play_passes > 0:
                 game.play_passes(play_passes)
-                self.log.info(f"<g>🎮 Played a game for <c>{self.display_name}</c></g>")
 
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to login!</r>")
