@@ -14,7 +14,7 @@ MODULE_DIR = Path(__file__).resolve().parents[1]
 MASTER_CRYPTO_FARM_BOT_DIR = Path(__file__).resolve().parents[3]
 sys.path.append(str(MASTER_CRYPTO_FARM_BOT_DIR))
 
-from utils.database import Database
+from mcf_utils.database import Database
 
 
 def getConfig(key, default=None):

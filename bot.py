@@ -35,8 +35,8 @@ CONFIG_ERROR_MSG = (
 sys.path.append(str(MASTER_CRYPTO_FARM_BOT_DIR))
 
 try:
-    import utils.logColors as lc
-    from utils.tgAccount import tgAccount
+    import mcf_utils.logColors as lc
+    from mcf_utils.tgAccount import tgAccount
 
     config_path = os.path.join(MASTER_CRYPTO_FARM_BOT_DIR, "config.py")
     if not os.path.exists(config_path):
