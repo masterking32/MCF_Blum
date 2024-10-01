@@ -91,6 +91,9 @@ async def process_pg_account(account, bot_globals, log):
             log.info(f"<y>❌ Account {account['session_name']} is disabled!</y>")
             return
 
+        if account.get("proxy") == "":
+            account["proxy"] = None
+
         tg = tgAccount(
             bot_globals,
             log,
@@ -174,6 +177,9 @@ async def handle_module_accounts(accounts, bot_globals, log):
         for account in accounts:
             try:
                 proxy = account.get("proxy")
+                if proxy == "":
+                    proxy = None
+
                 account_name = account.get("session_name")
                 web_app_data = account.get("web_app_data")
 
