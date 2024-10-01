@@ -88,7 +88,7 @@ def load_json_file(file_path, default=None):
 async def process_pg_account(account, bot_globals, log):
     try:
         if "disabled" in account and account["disabled"]:
-            log.info(f"<y>❌ Account {account['session_name']} is disabled!</y>")
+            log.info(f"<y>🟨 Account {account['session_name']} is disabled!</y>")
             return
 
         if account.get("proxy") == "":
@@ -106,7 +106,9 @@ async def process_pg_account(account, bot_globals, log):
         )
         web_app_data = await tg.run()
         if not web_app_data:
-            log.error(f"<r>└─ ❌ Account {account['session_name']} is not ready!</r>")
+            log.error(
+                f"<r>└─ ❌ Account {account['session_name']} is not ready! Unable to retrieve WebApp data.</r>"
+            )
             return
 
         web_app_query = tg.getTGWebQuery(web_app_data)
@@ -154,7 +156,7 @@ async def handle_pyrogram_accounts(accounts, bot_globals, log):
             try:
                 if account["session_name"] in disabled_sessions:
                     log.info(
-                        f"<y>❌ Account {account['session_name']} is disabled!</y>"
+                        f"<y>🟨 Account {account['session_name']} is disabled!</y>"
                     )
                     continue
                 await process_pg_account(account, bot_globals, log)
@@ -246,11 +248,15 @@ async def main():
             if pyrogram_accounts is not None:
                 await handle_pyrogram_accounts(pyrogram_accounts, bot_globals, log)
             else:
-                log.info("<y>🟠 No Pyrogram accounts found!</y>")
+                log.info(
+                    "<y>🟠 No Pyrogram accounts found.</y> <g>Ignore this if you are using module accounts.</g>"
+                )
 
             module_accounts = load_json_file(MODULE_ACCOUNTS_FILE, None)
             if module_accounts is None:
-                log.info("<y>🟠 No module accounts found!</y>")
+                log.info(
+                    "<y>🟠 No module accounts found.</y> <g>Ignore this if you are using Pyrogram accounts.</g>"
+                )
                 await check_cd(log)
                 continue
 
