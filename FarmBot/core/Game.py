@@ -50,3 +50,37 @@ class Game:
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to get balance!</r>")
             return None
+
+    def get_daily_reward(self, timezone_offset):
+        try:
+            response = self.http.get(
+                url="/api/v1/daily-reward?offset=" + timezone_offset,
+                domain="game",
+                display_errors=False,
+            )
+
+            if response is None:
+                return None
+
+            return response
+
+        except Exception as e:
+            self.log.error(f"<r>⭕ {e} failed to get daily reward!</r>")
+            return None
+
+    def claim_daily_reward(self, timezone_offset):
+        try:
+            response = self.http.post(
+                url="/api/v1/daily-reward?offset=" + timezone_offset,
+                domain="game",
+                only_json_response=False,
+            )
+
+            if response is None:
+                return None
+
+            return response
+
+        except Exception as e:
+            self.log.error(f"<r>⭕ {e} failed to get daily reward!</r>")
+            return None

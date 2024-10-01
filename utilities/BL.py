@@ -4,7 +4,7 @@
 # Telegram: https://t.me/MasterCryptoFarmBot
 
 
-import datetime
+from datetime import datetime
 import os
 import json
 from pathlib import Path
@@ -69,5 +69,9 @@ def delete_auth_token(session_name):
 
 
 def get_tz_offset():
-    offset_minutes = -datetime.now().astimezone().utcoffset().total_seconds() / 60
+    offset = datetime.now().astimezone().utcoffset()
+    if offset is not None:
+        offset_minutes = -offset.total_seconds() / 60
+    else:
+        offset_minutes = -200
     return int(offset_minutes)

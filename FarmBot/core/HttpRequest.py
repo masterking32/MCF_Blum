@@ -145,6 +145,7 @@ class HttpRequest:
         auth_header=True,
         return_headers=False,
         retries=3,
+        only_json_response=True,
     ):
         try:
             url = self._fix_url(url, domain)
@@ -206,6 +207,16 @@ class HttpRequest:
                     f"🔴 <red> POST Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
                 )
                 return (None, None) if return_headers else None
+
+            if (
+                "application/json" not in response.headers.get("Content-Type", "")
+                and only_json_response is False
+            ):
+                return (
+                    (response.text, response.headers)
+                    if return_headers
+                    else response.text
+                )
 
             return (
                 (response.json(), response.headers)

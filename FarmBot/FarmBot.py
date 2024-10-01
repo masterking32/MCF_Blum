@@ -5,6 +5,7 @@
 import sys
 import os
 
+from utilities.BL import get_tz_offset
 from .core.HttpRequest import HttpRequest
 from .core.Auth import Auth
 from .core.User import User
@@ -103,6 +104,30 @@ class FarmBot:
                 self.log.info(
                     f"<g>💳 The wallet is connected to {self.display_name}</g>"
                 )
+
+            tz_offset = str(get_tz_offset())
+            daily_reward = game.get_daily_reward(tz_offset)
+            if daily_reward is None:
+                self.log.info(
+                    f"<y>🎁 Daily reward for <c>{self.display_name}</c> is not available</y>"
+                )
+            elif "days" in daily_reward:
+                day_1 = daily_reward.get("days", [])
+                if len(day_1) >= 1:
+                    day_1 = day_1[1]
+                    ordinal = day_1.get("ordinal", 0)
+                    reward = day_1.get("reward", {})
+                    passes = reward.get("passes", 0)
+                    points = reward.get("points", 0)
+
+                    self.log.info(
+                        f"<g>🎁 Daily reward for <c>{self.display_name}</c>: Day: <c>{ordinal}</c>, Passes: <c>{passes}</c>, Points: <c>{points}</c></g>"
+                    )
+
+                    game.claim_daily_reward(tz_offset)
+                    self.log.info(
+                        f"<g>🎁 Claimed daily reward for <c>{self.display_name}</c></g>"
+                    )
 
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to login!</r>")
