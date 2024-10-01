@@ -204,6 +204,7 @@ class FarmBot:
                 time.sleep(1)
 
             game_balance = game.get_balance()
+            wallet_balance = wallet.get_balance()
             time.sleep(3)
 
             if game_balance.get("farming") is None:
