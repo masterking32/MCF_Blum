@@ -9,6 +9,9 @@ from pathlib import Path
 import signal
 import sys
 import os
+import time
+
+import psutil
 
 MODULE_DIR = Path(__file__).resolve().parents[1]
 MASTER_CRYPTO_FARM_BOT_DIR = Path(__file__).resolve().parents[3]
@@ -65,5 +68,29 @@ def clean_logs():
             os.remove(log_recent_file)
 
         os.rename(log_file, log_recent_file)
+    except Exception as e:
+        pass
+
+
+def kill_me():
+    try:
+        os.kill(os.getpid(), signal.SIGINT)
+    except Exception as e:
+        pass
+    try:
+        os.kill(os.getpid(), signal.SIGTERM)
+    except Exception as e:
+        pass
+    exit(0)
+
+
+def check_mcf_status(mcf_pid):
+    mcf_pid = int(mcf_pid)
+    try:
+        while True:
+            if not psutil.pid_exists(mcf_pid):
+                print("MCF is not running. Exiting ...")
+                kill_me()
+            time.sleep(1)
     except Exception as e:
         pass

@@ -10,6 +10,7 @@ import os
 import json
 import asyncio
 from pathlib import Path
+import threading
 
 import utilities.utilities as utilities
 from FarmBot.FarmBot import FarmBot
@@ -232,6 +233,16 @@ async def main():
     module_dir = Path(__file__).resolve().parent
     module_name = module_dir.name
     log = lc.getLogger(str(module_dir / "bot.log"), module_name)
+
+    mcf_pid = None
+    if len(sys.argv) > 1:
+        mcf_pid = sys.argv[1]
+        threading.Thread(target=utilities.check_mcf_status, args=(mcf_pid,)).start()
+    else:
+        log.error(
+            "<red>❌ Please run the bot with the MasterCryptoFarmBot script!❌</red>"
+        )
+
     log.info(f"<g>🔧 {module_name} module is starting ...</g>")
 
     bot_globals = {
