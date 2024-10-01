@@ -4,6 +4,10 @@
 # Telegram: https://t.me/MasterCryptoFarmBot
 
 
+from random import random
+import time
+
+
 class Game:
     def __init__(self, log, httpRequest, account_name):
         self.log = log
@@ -99,4 +103,72 @@ class Game:
 
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to start farming!</r>")
+            return None
+
+    def claim_farming(self):
+        try:
+            response = self.http.post(
+                url="/api/v1/farming/claim",
+                domain="game",
+                only_json_response=False,
+            )
+
+            if response is None:
+                return None
+
+            return response
+
+        except Exception as e:
+            self.log.error(f"<r>⭕ {e} failed to claim farming!</r>")
+            return None
+
+    def play_game(self):
+        try:
+            response = self.http.post(
+                url="/api/v1/game/play",
+                domain="game",
+            )
+
+            if response is None or "gameId" not in response:
+                self.log.error(f"<r>⭕ {self.account_name} failed to play game!</r>")
+                return None
+
+            return response
+
+        except Exception as e:
+            self.log.error(f"<r>⭕ {e} failed to send play passes!</r>")
+
+    def play_passes(self, games_count):
+        try:
+            if games_count == 0:
+                return None
+            self.log.info(
+                f"<g>🎮 Playing {games_count} games for {self.account_name} ...</g>"
+            )
+            for _ in range(games_count):
+                random_sleep = random.randint(3, 10)
+                self.log.info(
+                    f"<g>🎮 Waiting <c>{random_sleep}</c> seconds before starting a game ...</g>"
+                )
+
+                time.sleep(random_sleep)
+                self.get_balance()
+                self.get_now()
+
+                game_play_request = self.play_game()
+                if game_play_request is None:
+                    self.log.error(
+                        f"<r>⭕ {self.account_name} failed to play game!</r>"
+                    )
+                    return None
+
+                gameId = game_play_request.get("gameId")
+                random_sleep = random.randint(30, 40)
+
+                self.log.info(
+                    f"<g>🎮 Game started, waiting for <c>{random_sleep}</c> seconds ...</g>"
+                )
+
+        except Exception as e:
+            self.log.error(f"<r>⭕ {e} failed to play passes!</r>")
             return None

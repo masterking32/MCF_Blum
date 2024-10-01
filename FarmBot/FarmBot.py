@@ -4,8 +4,10 @@
 # Telegram: https://t.me/MasterCryptoFarmBot
 import sys
 import os
+import time
 
 from utilities.BL import get_tz_offset
+from utilities.utilities import getConfig
 from .core.HttpRequest import HttpRequest
 from .core.Auth import Auth
 from .core.User import User
@@ -81,8 +83,8 @@ class FarmBot:
 
             game = Game(self.log, self.http, self.account_name)
             now = game.get_now()
-            if now is None:
-                return
+            # if now is None:
+            #     return
 
             game_balance = game.get_balance()
             if game_balance is None:
@@ -92,7 +94,7 @@ class FarmBot:
             play_passes = game_balance.get("playPasses")
 
             self.log.info(
-                f"<g>💰 Balance for <c>{self.display_name}</c>: Available balance: <c>{available_balance}</c> Ḅ, Play passes: <c>{play_passes}</c> 🎮</g>"
+                f"<g>💰 Balance for <c>{self.display_name}</c>: Available balance: <c>{available_balance}Ḅ</c>, Play passes: <c>{play_passes}</c> 🎮</g>"
             )
 
             wallet = Wallet(self.log, self.http, self.account_name)
@@ -124,11 +126,12 @@ class FarmBot:
                     self.log.info(
                         f"<g>🎁 Daily reward for <c>{self.display_name}</c>: Day: <c>{ordinal}</c>, Passes: <c>{passes}</c>, Points: <c>{points}</c></g>"
                     )
-
+                    time.sleep(1)
                     game.claim_daily_reward(tz_offset)
                     self.log.info(
                         f"<g>🎁 Claimed daily reward for <c>{self.display_name}</c></g>"
                     )
+                    time.sleep(1)
 
             user_balance = wallet.get_balance()
             if user_balance is None:
@@ -170,7 +173,7 @@ class FarmBot:
                 if user_claim is not None and "claimBalance" in user_claim:
                     claim_balance = user_claim.get("claimBalance", 0)
                     self.log.info(
-                        f"<g>👥 Claimed <c>{user_amountForClaim}</c> invites, new balance: <c>{user_amountForClaim} Ḅ</c></g>"
+                        f"<g>👥 Claimed <c>{user_amountForClaim}</c> invites, new balance: <c>{user_amountForClaim}Ḅ</c></g>"
                     )
 
                     user_balance = user.get_balance()
@@ -187,17 +190,39 @@ class FarmBot:
                 self.log.info(
                     f"<g>🏞️ Try to join a tribe for </g><c>{self.display_name}</c>"
                 )
+                time.sleep(3)
                 tribe.join_tribe(leaderboard)
+                time.sleep(3)
 
             if game_balance.get("farming") and int(
                 game_balance.get("farming").get("endTime", 0)
             ) < int(game_balance.get("timestamp", 0)):
-                print("|CCCCCCvCCCCCC|")
+                game.claim_farming()
+                self.log.info(
+                    f"<g>🌾 Claimed farming for <c>{self.display_name}</c></g>"
+                )
+                time.sleep(1)
+
+            game_balance = game.get_balance()
+            time.sleep(3)
+
             if game_balance.get("farming") is None:
                 game.start_farming()
                 self.log.info(
                     f"<g>🌾 Farming started for <c>{self.display_name}</c></g>"
                 )
+
+            available_balance = game_balance.get("availableBalance", 0).split(".")[0]
+            play_passes = game_balance.get("playPasses", 0)
+
+            self.log.info(
+                f"<g>💰 Balance for <c>{self.display_name}</c>: Available balance: <c>{available_balance}Ḅ</c>, Play passes: <c>{play_passes}</c> 🎮</g>"
+            )
+
+            if getConfig("game_enabled", True) and play_passes > 0:
+                game.play_passes(play_passes)
+                self.log.info(f"<g>🎮 Played a game for <c>{self.display_name}</c></g>")
+
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to login!</r>")
             self.log.error(f"<r>⭕ {self.display_name} failed to login!</r>")
