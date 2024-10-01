@@ -35,6 +35,12 @@ CONFIG_ERROR_MSG = (
 sys.path.append(str(MASTER_CRYPTO_FARM_BOT_DIR))
 
 try:
+    if sys.stdout.encoding.lower() != "utf-8":
+        sys.stdout.reconfigure(encoding="utf-8")
+except Exception as e:
+    pass
+
+try:
     import mcf_utils.logColors as lc
     from mcf_utils.tgAccount import tgAccount
 
