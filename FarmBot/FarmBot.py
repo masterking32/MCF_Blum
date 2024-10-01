@@ -129,6 +129,42 @@ class FarmBot:
                         f"<g>🎁 Claimed daily reward for <c>{self.display_name}</c></g>"
                     )
 
+            user_balance = wallet.get_balance()
+            if user_balance is None:
+                return
+
+            wallet_balance = wallet.get_balance()
+            if wallet_balance is None:
+                return
+
+            user_invites = user_balance.get("usedInvitation", 0)
+            user_amountForClaim = 0
+            try:
+                user_amountForClaim = int(user_balance.get("amountForClaim", "0"))
+            except:
+                user_amountForClaim = 0
+
+            self.log.info(
+                f"<g>👥 <c>{self.display_name}</c> has <c>{user_invites}</c> invites.</g>"
+            )
+
+            if (
+                user_invites > 0
+                and user_balance.get("canClaim", False)
+                and user_amountForClaim > 0
+            ):
+                user_claim = user.claim_friend_invite()
+                if user_claim is not None and "claimBalance" in user_claim:
+                    claim_balance = user_claim.get("claimBalance", 0)
+                    self.log.info(
+                        f"<g>👥 Claimed <c>{user_amountForClaim}</c> invites, new balance: <c>{user_amountForClaim} Ḅ</c></g>"
+                    )
+
+                    user_balance = wallet.get_balance()
+                    if user_balance is not None:
+                        user_invites = user_balance.get("usedInvitation", 0)
+                        user_amountForClaim = 0
+
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to login!</r>")
             self.log.error(f"<r>⭕ {self.display_name} failed to login!</r>")

@@ -25,3 +25,18 @@ class Wallet:
 
         except Exception as e:
             return None
+
+    def get_balance(self):
+        try:
+            response = self.http.get(
+                url="/api/v1/wallet/my/points/balance",
+                domain="wallet",
+            )
+
+            if response is None:
+                return None
+
+            return response
+
+        except Exception as e:
+            return None
