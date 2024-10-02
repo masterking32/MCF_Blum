@@ -84,12 +84,16 @@ def kill_me():
     exit(0)
 
 
-def check_mcf_status(mcf_pid):
+def check_mcf_status(log, mcf_pid, module_name):
     mcf_pid = int(mcf_pid)
+    log.info("<green>Montoring MCF thread started</green>")
     try:
         while True:
             if not psutil.pid_exists(mcf_pid):
-                print("MCF is not running. Exiting ...")
+                log.error(
+                    f"<red>MCF restarted or Closed. Killing {module_name} module</red>"
+                )
+                log.info("<green>Module stopped</green>")
                 kill_me()
             time.sleep(1)
     except Exception as e:

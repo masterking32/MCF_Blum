@@ -237,7 +237,9 @@ async def main():
     mcf_pid = None
     if len(sys.argv) > 1:
         mcf_pid = sys.argv[1]
-        threading.Thread(target=utilities.check_mcf_status, args=(mcf_pid,)).start()
+        threading.Thread(
+            target=utilities.check_mcf_status, args=(log, mcf_pid, module_name)
+        ).start()
     else:
         log.error(
             "<red>❌ Please run the bot with the MasterCryptoFarmBot script!❌</red>"
