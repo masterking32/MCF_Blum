@@ -54,6 +54,9 @@ try:
     cfg = importlib.util.module_from_spec(spec)
     sys.modules["config"] = cfg
     spec.loader.exec_module(cfg)
+
+    from mcf_utils.database import Database
+    from mcf_utils import utils
 except Exception as e:
     print(CONFIG_ERROR_MSG)
     exit(1)
@@ -252,6 +255,17 @@ async def main():
         "mcf_dir": str(MASTER_CRYPTO_FARM_BOT_DIR),
         "module_dir": str(module_dir),
     }
+
+    db_location = os.path.join(MASTER_CRYPTO_FARM_BOT_DIR, "database.db")
+    db = Database(db_location, log)
+    license_key = db.getSettings("license", None)
+    if license_key is None or license_key == "":
+        log.error("<r>❌ License key is not set!</r>")
+        exit(1)
+    else:
+        log.info(f"<g>🔑 License key: </g><c>{utils.hide_text(license_key)}</c>")
+
+    bot_globals["license"] = license_key
 
     if utilities.is_module_disabled(bot_globals, log):
         log.info(f"<r>🚫 {module_name} module is disabled!</r>")
