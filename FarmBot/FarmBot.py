@@ -14,6 +14,7 @@ from .core.User import User
 from .core.Game import Game
 from .core.Wallet import Wallet
 from .core.Tribe import Tribe
+from .core.Tasks import Tasks
 
 MasterCryptoFarmBot_Dir = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__ + "/../../"))
@@ -222,6 +223,10 @@ class FarmBot:
 
             if getConfig("game_enabled", True) and play_passes > 0:
                 game.play_passes(play_passes)
+
+            if getConfig("task_enabled", True):
+                tasks = Tasks(self.log, self.http, self.account_name)
+                tasks_list = tasks.claim_tasks()
 
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to login!</r>")
