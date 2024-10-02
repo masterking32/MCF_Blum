@@ -2,6 +2,7 @@
 # Date: 2024
 # Github: https://github.com/masterking32
 # Telegram: https://t.me/MasterCryptoFarmBot
+import random
 import sys
 import os
 import time
@@ -224,11 +225,29 @@ class FarmBot:
             if getConfig("game_enabled", True) and play_passes > 0:
                 game.play_passes(play_passes)
 
-            if getConfig("task_enabled", True):
-                tasks = Tasks(self.log, self.http, self.account_name)
-                tasks_list = tasks.claim_tasks()
+            if not getConfig("task_enabled", True):
+                return
+
+            tasks = Tasks(self.log, self.http, self.account_name, self.tgAccount)
+            tasks_list = await tasks.claim_tasks()
+
+            game_balance = game.get_balance()
+            wallet_balance = wallet.get_balance()
+
+            available_balance = game_balance.get("availableBalance", 0).split(".")[0]
+            play_passes = game_balance.get("playPasses", 0)
+
+            self.log.info(
+                f"<g>💰 Balance for <c>{self.display_name}</c>: Available balance: <c>{available_balance}Ḅ</c>, Play passes: <c>{play_passes}</c> 🎮</g>"
+            )
 
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to login!</r>")
             self.log.error(f"<r>⭕ {self.display_name} failed to login!</r>")
             return None, None
+        finally:
+            random_sleep = random.randint(30, 120)
+            self.log.info(
+                f"<g>⌛ Farming for <c>{self.display_name}</c> completed. Waiting for <c>{random_sleep}</c> seconds before running the next account...</g>"
+            )
+            time.sleep(random_sleep)

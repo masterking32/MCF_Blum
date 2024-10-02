@@ -165,7 +165,9 @@ class Game:
             if games_count == 0:
                 return None
 
-            games_count_to_play = random.randint(1, min(games_count, 5))
+            games_count_to_play = random.randint(
+                min(4, games_count), min(games_count, 6)
+            )
             self.log.info(
                 f"<g>🎮 We are playing <c>{games_count_to_play}</c> games of <c>{games_count}</c> your games for <c>{self.account_name}</c> ...</g>"
             )

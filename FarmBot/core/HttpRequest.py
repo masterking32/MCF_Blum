@@ -391,7 +391,47 @@ class HttpRequest:
             proxies=proxy,
         )
 
-        if response.status_code != 200:
+        if response.status_code == 401:
+            try:
+                self.log.info(
+                    "🟡 <y>Retrying previous request after renewing the access token...</y>"
+                )
+
+                url = self._fix_url(
+                    "/api/v1/auth/provider/PROVIDER_TELEGRAM_MINI_APP", "user"
+                )
+                response = requests.post(
+                    url=url,
+                    headers=headers,
+                    data=json.dumps(
+                        {
+                            "query": self.tgWebData,
+                        }
+                    ),
+                    proxies=proxy,
+                )
+
+                response = response.json()
+                if response is None:
+                    self.log.error(f"<r>⭕ {self.account_name} failed to login!</r>")
+                    return False
+
+                access_token = response.get("token", {}).get("access")
+                refresh_token = response.get("token", {}).get("refresh")
+
+                if not access_token:
+                    self.log.error(f"<r>🔴 {self.account_name} failed to login!</r>")
+                    return False
+
+                self.authToken = access_token
+                self.RefreshToken = refresh_token
+                self.log.info(f"🟢 <g>Access token renewed successfully</g>")
+                return True
+            except Exception as e:
+                self.log.error(f"🔴 <red> POST Request Error: <y>{url}</y> {e}</red>")
+                return False
+
+        elif response.status_code != 200:
             self.log.error(
                 f"🔴 <red> POST Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
             )
