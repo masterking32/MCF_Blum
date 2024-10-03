@@ -181,7 +181,6 @@ class HttpRequest:
                 )
 
             if response.status_code == 401:
-                print(url)
                 if self.renew_access_token():
                     self.log.info(
                         "🟡 <y>Retrying request after renewing access token...</y>"
