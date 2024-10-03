@@ -5,60 +5,64 @@
 
 ---
 
-This module for the [MasterCryptoFarmBot](https://github.com/masterking32/MasterCryptoFarmBot) enables automated air-drop farming in the Blum Telegram game.
+# MCF_Blum Module
+
+This module for the [MasterCryptoFarmBot](https://github.com/masterking32/MasterCryptoFarmBot) automates air-drop farming in the Blum Telegram game.
 
 ---
 
-#### ⭐ If you find this project useful, please consider giving it a star! ⭐
+## ⭐ Support the Project
 
-<a href="https://github.com/masterking32/MasterHamsterKombatBot/stargazers"><img align="center" src="https://raw.githubusercontent.com/masterking32/MasterCryptoFarmBot/refs/heads/main/web/public_html/images/github_star.png" alt="github_star" /></a>
+If you find this project useful, please consider giving it a star!
+
+[![GitHub Star](https://raw.githubusercontent.com/masterking32/MasterCryptoFarmBot/refs/heads/main/web/public_html/images/github_star.png)](https://github.com/masterking32/MasterHamsterKombatBot/stargazers)
 
 ---
 
 ## Module Features
 
-- ✅ **Tasks:** Automatically complete tasks. (Video, Join Channel, Start Bot, etc.)
-- 🌲 **Automatic Farming:** Automatically start and claim farms.
-- 👥 **Claim Friends Reward:** Automatically claim friends rewards.
-- 🌍 **Automatic join tribes:** Joining random tribes if you are not joined before.
-- 🎮 **Play Pass:** Automatically play Play Pass games.
-- 🎁 **Daily Bonus:** Automatically claim daily bonus.
+- **📋 Tasks:** Automatically complete tasks (e.g., Video, Join Channel, Start Other Bots).
+- **🚜 Automatic Farming:** Start and claim farms automatically.
+- **🎁 Claim Friends Reward:** Automatically claim friends' rewards.
+- **🏹 Join Tribes:** Automatically join random tribes if not already joined.
+- **🎮 Play Pass:** Automatically play Play Pass games.
+- **🎉 Daily Bonus:** Automatically claim daily bonuses.
 
 ---
 
-❌ This project is intended for testing purposes only. Please refrain from abusing it. ❌
+## ⚠️ Disclaimer
 
-⚠️ Use this at your own risk. The developers are not responsible for any misuse or abuse. ⚠️
+🚫 This project is intended for testing purposes only. Please refrain from abusing it.
+
+⚠️ Use at your own risk. The developers are not responsible for any misuse or abuse.
 
 ---
 
 ## 💿 Installation
 
-1. ⏬ Install the [MasterCryptoFarmBot](https://github.com/masterking32/MasterCryptoFarmBot/wiki/Installation-Guide).
-2. 📥 Install the [MCF_Blum](https://github.com/masterking32/MCF_Blum) from your control panel. ([HowTo: Install Bot Modules](https://github.com/masterking32/MasterCryptoFarmBot/wiki/HowTo:-Install-Bot-Modules))
+1. Install the [MasterCryptoFarmBot](https://github.com/masterking32/MasterCryptoFarmBot/wiki/Installation-Guide).
+2. Install the [MCF_Blum](https://github.com/masterking32/MCF_Blum) from your control panel. ([How to Install Bot Modules](https://github.com/masterking32/MasterCryptoFarmBot/wiki/HowTo:-Install-Bot-Modules))
 
 ## 🛠️ Configuration
 
-1. 🖥️ Open the MasterCryptoFarmBot Control Panel. ([HowTo: Access to Control Panel](https://github.com/masterking32/MasterCryptoFarmBot/wiki/HowTo:-Access-to-Control-Panel))
-2. ⚙️ Go to the `Manage Modules` section. ([HowTo: Change Configuration of Bot Module](https://github.com/masterking32/MasterCryptoFarmBot/wiki/HowTo:-Change-Configuration-of-Bot-Module))
+1. Open the MasterCryptoFarmBot Control Panel. ([How to Access Control Panel](https://github.com/masterking32/MasterCryptoFarmBot/wiki/HowTo:-Access-to-Control-Panel))
+2. Go to the `Manage Modules` section. ([How to Change Configuration of Bot Module](https://github.com/masterking32/MasterCryptoFarmBot/wiki/HowTo:-Change-Configuration-of-Bot-Module))
 
 ---
 
 ## 🤔 Need Help?
 
-🐛 If you find a bug in **this module**, please [open an issue](https://github.com/masterking32/MCF_Blum/issues).
-
-💬 If you have any questions, ideas, suggestions, or need help, please [open a discussion](https://github.com/masterking32/MCF_Blum/discussions) or join the [Telegram Group](https://t.me/MasterCryptoFarmBotGroup).
-
-🐞 If you find a bug in the **MasterCryptoFarmBot**, please [open an issue](https://github.com/masterking32/MasterCryptoFarmBot/issues).
-
-📢 If you have any questions, ideas, suggestions, or need help for the **MasterCryptoFarmBot**, please [open a discussion](https://github.com/masterking32/MasterCryptoFarmBot/issues) or join the [Telegram Group](https://t.me/MasterCryptoFarmBotGroup).
+- **Bug in this module?** [Open an issue](https://github.com/masterking32/MCF_Blum/issues).
+- **Questions or suggestions?** [Open a discussion](https://github.com/masterking32/MCF_Blum/discussions) or join the [Telegram Group](https://t.me/MasterCryptoFarmBotGroup).
+- **Bug in MasterCryptoFarmBot?** [Open an issue](https://github.com/masterking32/MasterCryptoFarmBot/issues).
+- **Questions or suggestions for MasterCryptoFarmBot?** [Open a discussion](https://github.com/masterking32/MasterCryptoFarmBot/issues) or join the [Telegram Group](https://t.me/MasterCryptoFarmBotGroup).
 
 ---
 
-### [📢 Telegram Channel](https://t.me/MasterCryptoFarmBot)
+## 📢 Stay Connected
 
-### [💬 Telegram Group](https://t.me/MasterCryptoFarmBotGroup)
+- [Telegram Channel](https://t.me/MasterCryptoFarmBot)
+- [Telegram Group](https://t.me/MasterCryptoFarmBotGroup)
 
 ---
 
