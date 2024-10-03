@@ -163,10 +163,20 @@ class Tasks:
                         "t.me" in channel_url or "@" in channel_url
                     ):
                         try:
+                            channel_url = (
+                                channel_url.replace("https://t.me/", "")
+                                .replace("@", "")
+                                .replace("boost/", "")
+                            )
+
+                            channel_url = (
+                                channel_url.split("/")[0]
+                                if "/" in channel_url
+                                else channel_url
+                            )
+
                             await self.tgAccount.joinChat(
-                                channel_url.replace("https://t.me/", "").replace(
-                                    "@", ""
-                                )
+                                channel_url,
                             )
                             self.log.info(
                                 f"<g>✅ Joined Telegram Group/Channel <c>{task_title}</c> successfully!</g>"
@@ -266,7 +276,9 @@ class Tasks:
                 self.log.info(f"<g>✅ Task <c>{task_title}</c> started!</g>")
                 self.recheck_claim = True
 
-            time.sleep(random.randint(10, 25))
+            time.sleep(random.randint(15, 30))
+            self.game.get_balance()
+            time.sleep(random.randint(15, 30))
             if task_validation_type == "KEYWORD" and answer_keyword is not None:
                 self.log.info(f"<g>🔑 Validating task <c>{task_title}</c>...</g>")
                 self.processed_tasks.append(task_id)
