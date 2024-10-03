@@ -8,6 +8,7 @@ import json
 import random
 import time
 from .Wallet import Wallet
+from .Game import Game
 from utilities.utilities import getConfig
 from mcf_utils.tgAccount import tgAccount as TG
 from mcf_utils.api import API
@@ -31,6 +32,7 @@ class Tasks:
         self.license_key = license_key
         self.bot_globals = bot_globals
         self.processed_tasks = []
+        self.game = Game(self.log, self.http, self.account_name)
 
     async def claim_tasks(self):
         try:
@@ -90,6 +92,8 @@ class Tasks:
                 self.claim_task_request(task_id)
                 self.processed_tasks.append(task_id)
                 self.log.info(f"<g>✅ Task <c>{task_title}</c> claimed!</g>")
+                time.sleep(random.randint(1, 5))
+                self.game.get_balance()
                 return
 
             if "subTasks" in task:
@@ -257,6 +261,7 @@ class Tasks:
                 self.processed_tasks.append(task_id)
                 start_response = self.start_task_request(task_id)
                 if start_response is None:
+                    time.sleep(random.randint(1, 5))
                     return
                 self.log.info(f"<g>✅ Task <c>{task_title}</c> started!</g>")
                 self.recheck_claim = True
@@ -268,6 +273,8 @@ class Tasks:
                 self.validate_task_request(task_id, answer_keyword)
                 self.log.info(f"<g>✅ Task <c>{task_title}</c> validated!</g>")
                 time.sleep(random.randint(1, 4))
+
+            self.game.get_balance()
 
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to start progress!</r>")
