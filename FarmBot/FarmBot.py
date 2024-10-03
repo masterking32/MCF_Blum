@@ -135,13 +135,13 @@ class FarmBot:
                     )
                     time.sleep(1)
 
-            user_balance = wallet.get_balance()
-            if user_balance is None:
-                return
+            user_balance = user.get_balance()
+            # if user_balance is None:
+            #     return
 
             wallet_balance = wallet.get_balance()
-            if wallet_balance is None:
-                return
+            # if wallet_balance is None:
+            #     return
 
             tribe = Tribe(self.log, self.http, self.account_name)
             tribe_my = tribe.get_my()
@@ -155,32 +155,33 @@ class FarmBot:
                     f"<g>🏞️ The tribe is connected to {self.display_name}: <c>{tribe_title}</c></g>"
                 )
 
-            user_invites = user_balance.get("usedInvitation", 0)
-            user_amountForClaim = 0
-            try:
-                user_amountForClaim = int(user_balance.get("amountForClaim", "0"))
-            except:
+            if user_balance is not None:
+                user_invites = user_balance.get("usedInvitation", 0)
                 user_amountForClaim = 0
+                try:
+                    user_amountForClaim = int(user_balance.get("amountForClaim", "0"))
+                except:
+                    user_amountForClaim = 0
 
-            self.log.info(
-                f"<g>👥 <c>{self.display_name}</c> has <c>{user_invites}</c> invites.</g>"
-            )
+                self.log.info(
+                    f"<g>👥 <c>{self.display_name}</c> has <c>{user_invites}</c> invites.</g>"
+                )
 
-            if (
-                user_invites > 0
-                and user_balance.get("canClaim", False)
-                and user_amountForClaim > 0
-            ):
-                user_claim = user.claim_friend_invite()
-                if user_claim is not None and "claimBalance" in user_claim:
-                    claim_balance = user_claim.get("claimBalance", 0)
-                    self.log.info(
-                        f"<g>👥 Claimed <c>{user_amountForClaim}</c> invites, new balance: <c>{user_amountForClaim}Ḅ</c></g>"
-                    )
+                if (
+                    user_invites > 0
+                    and user_balance.get("canClaim", False)
+                    and user_amountForClaim > 0
+                ):
+                    user_claim = user.claim_friend_invite()
+                    if user_claim is not None and "claimBalance" in user_claim:
+                        claim_balance = user_claim.get("claimBalance", 0)
+                        self.log.info(
+                            f"<g>👥 Claimed <c>{user_amountForClaim}</c> invites, new balance: <c>{user_amountForClaim}Ḅ</c></g>"
+                        )
 
-                    user_balance = user.get_balance()
-                    if user_balance is not None:
-                        user_balance = user_balance.get("balance", 0)
+                        user_balance = user.get_balance()
+                        if user_balance is not None:
+                            user_balance = user_balance.get("balance", 0)
 
             game_balance = game.get_balance()
             if game_balance is not None:
@@ -228,7 +229,15 @@ class FarmBot:
             if not getConfig("task_enabled", True):
                 return
 
-            tasks = Tasks(self.log, self.http, self.account_name, self.tgAccount)
+            license_key = self.bot_globals.get("license", None)
+            tasks = Tasks(
+                self.log,
+                self.http,
+                self.account_name,
+                self.bot_globals,
+                self.tgAccount,
+                license_key,
+            )
             tasks_list = await tasks.claim_tasks()
 
             game_balance = game.get_balance()

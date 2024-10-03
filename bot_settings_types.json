@@ -32,6 +32,13 @@
     "description": "Should the bot automatically do tasks for you?"
   },
   {
+    "key": "allow_start_other_bots",
+    "name": "Tasks [Auto Start Bots]",
+    "type": "checkbox",
+    "default_value": "on",
+    "description": "Some of tasks require to start other bots, should the bot automatically start them?"
+  },
+  {
     "key": "check_interval",
     "name": "Check interval (seconds)",
     "type": "number",

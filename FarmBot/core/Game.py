@@ -200,9 +200,7 @@ class Game:
                 sleep_time = random_sleep / 3
                 time.sleep(sleep_time)
                 self.get_balance()
-                wallet.get_balance()
                 time.sleep(sleep_time)
-                self.get_balance()
                 wallet.get_balance()
                 time.sleep(sleep_time)
 
@@ -231,7 +229,7 @@ class Game:
             balance = self.get_balance()
             if balance is None:
                 return True
-            wallet.get_balance()
+            # wallet.get_balance()
             self.get_now()
 
             available_balance = balance.get("availableBalance", 0).split(".")[0]

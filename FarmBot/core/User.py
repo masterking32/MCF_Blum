@@ -33,7 +33,7 @@ class User:
         try:
             response = self.http.get(
                 url="/api/v1/friends/balance",
-                domain="wallet",
+                domain="user",
             )
 
             if response is None:
@@ -50,7 +50,7 @@ class User:
         try:
             response = self.http.post(
                 url="/api/v1/friends/claim",
-                domain="wallet",
+                domain="user",
             )
 
             if response is None:

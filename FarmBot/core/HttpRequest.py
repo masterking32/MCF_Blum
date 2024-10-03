@@ -34,6 +34,7 @@ class HttpRequest:
         self.RefreshToken = None
         self.tgWebData = tgWebData
         self.account_name = account_name
+        self.token_refreshed = False
 
         if not self.user_agent or self.user_agent == "":
             self.user_agent = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Mobile Safari/537.3"
@@ -180,6 +181,7 @@ class HttpRequest:
                 )
 
             if response.status_code == 401:
+                print(url)
                 if self.renew_access_token():
                     self.log.info(
                         "🟡 <y>Retrying request after renewing access token...</y>"
@@ -364,6 +366,11 @@ class HttpRequest:
         return default_headers
 
     def renew_access_token(self):
+        if self.token_refreshed:
+            return False
+
+        self.token_refreshed = True
+
         self.log.info("🟡 <y>Renewing access token...</y>")
 
         headers = self._get_default_headers()
