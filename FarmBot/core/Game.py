@@ -190,7 +190,12 @@ class Game:
                     )
                     return None
 
-                gameId = game_play_request.get("gameId")
+                gameId = game_play_request.get("gameId", None)
+                if gameId is None:
+                    self.log.error(
+                        f"<r>⭕ {self.account_name} failed to play game!</r>"
+                    )
+                    continue
                 random_sleep = random.randint(30, 38)
 
                 self.log.info(

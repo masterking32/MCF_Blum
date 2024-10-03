@@ -292,7 +292,6 @@ class HttpRequest:
                     headers,
                     valid_response_code,
                     retries - 1,
-                    method=method,
                 )
             self.log.error(f"🔴 <red> OPTIONS Request Error: <y>{url}</y> {e}</red>")
             return None
@@ -416,6 +415,12 @@ class HttpRequest:
                     ),
                     proxies=proxy,
                 )
+
+                if response.status_code != 200:
+                    self.log.error(
+                        f"🔴 <red> POST Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
+                    )
+                    return False
 
                 response = response.json()
                 if response is None:
