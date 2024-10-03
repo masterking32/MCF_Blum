@@ -223,7 +223,7 @@ class Tasks:
                 except Exception as e:
                     self.log.error(f"<r>⭕ {e} failed to start bot!</r>")
                     return
-            elif task_type == "SOCIAL_MEDIA_CHECK":
+            elif task_type == "SOCIAL_MEDIA_CHECK" or task_type == "INTERNAL":
                 pass
             else:
                 self.log.info(f"<y>🟡 Task <c>{task_title}</c> is not supported!</y>")
