@@ -206,9 +206,6 @@ class FarmBot:
             if game_balance is None:
                 game_balance = old_game_balance
 
-
-            if game_balance.get("farming") is None:
-
             wallet_balance = wallet.get_balance()
             time.sleep(3)
 
