@@ -15,7 +15,7 @@ This module for the [MasterCryptoFarmBot](https://github.com/masterking32/Master
 
 If you find this project useful, please consider giving it a star!
 
-[![GitHub Star](https://raw.githubusercontent.com/masterking32/MasterCryptoFarmBot/refs/heads/main/web/public_html/images/github_star.png)](https://github.com/masterking32/MasterHamsterKombatBot/stargazers)
+[![GitHub Star](https://raw.githubusercontent.com/masterking32/MasterCryptoFarmBot/refs/heads/main/web/public_html/images/github_star.png)](https://github.com/masterking32/MCF_Blum/stargazers)
 
 ---
 
