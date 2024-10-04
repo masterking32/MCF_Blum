@@ -191,22 +191,21 @@ class Game:
                     return None
 
                 gameId = game_play_request.get("gameId", None)
-                if gameId is None:
+                if gameId is None or gameId == "":
                     self.log.error(
                         f"<r>⭕ {self.account_name} failed to play game!</r>"
                     )
                     continue
+
+                self.log.info(f"<g>🎮 Game Id: <c>{gameId}</c> has started</g>")
+
                 random_sleep = random.randint(30, 38)
 
                 self.log.info(
                     f"<g>🎮 Game started, waiting for <c>{random_sleep}</c> seconds ...</g>"
                 )
 
-                sleep_time = random_sleep / 3
-                time.sleep(sleep_time)
-                self.get_balance()
-                time.sleep(sleep_time)
-                wallet.get_balance()
+                sleep_time = random_sleep
                 time.sleep(sleep_time)
 
                 points = random.randint(

@@ -51,12 +51,16 @@ class Tasks:
                     for task in section["tasks"]:
                         await self.handle_task(task)
 
+                if self.recheck_claim:
+                    time.sleep(random.randint(5, 10))
+                    return await self.claim_tasks()
+
                 if "subSections" in section:
                     for sub_section in section["subSections"]:
                         await self.handle_sub_section(sub_section)
 
             if self.recheck_claim:
-                time.sleep(random.randint(5, 15))
+                time.sleep(random.randint(5, 10))
                 self.log.info(
                     f"<g>📃 Rechecking tasks for account <cyan>{self.account_name}</cyan>...</g>"
                 )
@@ -65,6 +69,7 @@ class Tasks:
             self.log.info(
                 f"<g>✅ Tasks claimed for account <cyan>{self.account_name}</cyan>!</g>"
             )
+
             return True
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to claim tasks!</r>")
@@ -89,11 +94,13 @@ class Tasks:
                 if task_id in self.processed_tasks:
                     return
                 self.log.info(f"<g>📃 Claiming task <c>{task_title}</c>...</g>")
-                self.claim_task_request(task_id)
                 self.processed_tasks.append(task_id)
+                claim_status = self.claim_task_request(task_id)
+                if claim_status is None:
+                    time.sleep(random.randint(1, 5))
+                    return
                 self.log.info(f"<g>✅ Task <c>{task_title}</c> claimed!</g>")
                 time.sleep(random.randint(1, 5))
-                self.game.get_balance()
                 return
 
             if "subTasks" in task:
@@ -105,7 +112,8 @@ class Tasks:
                 return
 
             task_validation_type = task.get("validationType", "DEFAULT")
-            if task_status == "STARTED" and task_validation_type not in ["KEYWORD"]:
+            # if task_status == "STARTED" and task_validation_type not in ["KEYWORD"]:
+            if task_status == "STARTED":
                 self.log.info(
                     f"<g>🟡 <c>{task_title}</c> Task is not ready to claim and is under verification.</g>"
                 )
@@ -225,6 +233,7 @@ class Tasks:
                         proxy=self.http.proxy,
                         BotID=bot_id,
                         ReferralToken=ref_link,
+                        MuteBot=True,
                     )
                     await tg.getWebViewData()
 
@@ -276,17 +285,23 @@ class Tasks:
                 self.log.info(f"<g>✅ Task <c>{task_title}</c> started!</g>")
                 self.recheck_claim = True
 
-            time.sleep(random.randint(15, 30))
-            self.game.get_balance()
-            time.sleep(random.randint(15, 30))
-            if task_validation_type == "KEYWORD" and answer_keyword is not None:
-                self.log.info(f"<g>🔑 Validating task <c>{task_title}</c>...</g>")
-                self.processed_tasks.append(task_id)
-                self.validate_task_request(task_id, answer_keyword)
-                self.log.info(f"<g>✅ Task <c>{task_title}</c> validated!</g>")
-                time.sleep(random.randint(1, 4))
+            if task_status != "READY_FOR_VERIFY":
+                return
 
-            self.game.get_balance()
+            if task_validation_type == "KEYWORD" and answer_keyword is not None:
+                self.log.info(f"<g>🔑 Verifying task <c>{task_title}</c>...</g>")
+                self.processed_tasks.append(task_id)
+                response = self.validate_task_request(task_id, answer_keyword)
+                if response is None:
+                    self.log.info(
+                        f"<y>🟡 Task <c>{task_title}</c> verification failed!</y>"
+                    )
+                    time.sleep(random.randint(1, 4))
+                    return
+
+                self.log.info(f"<g>✅ Task <c>{task_title}</c> verified!</g>")
+                time.sleep(random.randint(1, 4))
+                self.recheck_claim = True
 
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to start progress!</r>")
@@ -298,6 +313,7 @@ class Tasks:
                 url=f"/api/v1/tasks/{task_id}/validate",
                 domain="earn",
                 data=json.dumps({"keyword": keyword}),
+                display_errors=False,
             )
 
             if response is None:
@@ -315,6 +331,7 @@ class Tasks:
             response = self.http.post(
                 url=f"/api/v1/tasks/{task_id}/start",
                 domain="earn",
+                display_errors=False,
             )
 
             if response is None:
@@ -331,6 +348,7 @@ class Tasks:
             response = self.http.post(
                 url=f"/api/v1/tasks/{task_id}/claim",
                 domain="earn",
+                display_errors=False,
             )
 
             if response is None:
