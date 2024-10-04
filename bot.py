@@ -11,6 +11,7 @@ import json
 import asyncio
 from pathlib import Path
 import threading
+import hashlib
 
 import utilities.utilities as utilities
 from FarmBot.FarmBot import FarmBot
@@ -95,11 +96,17 @@ def load_json_file(file_path, default=None):
     return default
 
 
-async def process_pg_account(account, bot_globals, log):
+async def process_pg_account(account, bot_globals, log, group_id=None):
     try:
         if "disabled" in account and account["disabled"]:
-            log.info(f"<y>🟨 Account {account['session_name']} is disabled!</y>")
+            log.info(
+                f"<y>🟨 Account <c>{account['session_name']}</c> from group <c>{group_id}</c> is disabled!</y>"
+            )
             return
+
+        log.info(
+            f"<g>🔆 Start processing Pyrogram account <c>{account['session_name']}</c> from group <c>{group_id}</c> ...</g>"
+        )
 
         if account.get("proxy") == "":
             account["proxy"] = None
@@ -114,21 +121,24 @@ async def process_pg_account(account, bot_globals, log):
             SHORT_APP_NAME,
             APP_URL,
         )
+
         web_app_data = await tg.run()
         if not web_app_data:
             log.error(
-                f"<r>└─ ❌ Account {account['session_name']} is not ready! Unable to retrieve WebApp data.</r>"
+                f"<r>└─ ❌ Account <c>{account['session_name']}</c> from group <c>{group_id}</c> is not ready! Unable to retrieve WebApp data.</r>"
             )
             return
 
         web_app_query = tg.getTGWebQuery(web_app_data)
         if not web_app_query:
             log.error(
-                f"<r>└─ ❌ Account {account['session_name']} WebApp query is not valid!</r>"
+                f"<r>└─ ❌ Account <c>{account['session_name']}</c> from group <c>{group_id}</c> WebApp query is not valid!</r>"
             )
             return
 
-        log.info(f"<g>└─ ✅ Account {account['session_name']} is ready!</g>")
+        log.info(
+            f"<g>└─ ✅ Account <c>{account['session_name']}</c> from group <c>{group_id}</c> is ready!</g>"
+        )
         fb = FarmBot(
             log=log,
             bot_globals=bot_globals,
@@ -142,93 +152,141 @@ async def process_pg_account(account, bot_globals, log):
 
         await fb.run()
     except Exception as e:
-        log.error(f"<r>❌ Error processing Pyrogram account: {e}</r>")
+        log.error(
+            f"<r>❌ Account <c>{account['session_name']}</c> from group <c>{group_id}</c>, Error processing Pyrogram account: {e}</r>"
+        )
         return False
-
-
-async def handle_pyrogram_accounts(accounts, bot_globals, log):
-    try:
+    finally:
         log.info(
-            f"<g>🖥️ Start processing <c>{len(accounts)}</c> Pyrogram accounts ...</g>"
+            f"<g>✅ Pyrogram account <c>{account['session_name']}</c> from group <c>{group_id}</c> has been processed.</g>"
         )
 
-        if (
-            bot_globals["telegram_api_id"] == 1234
-            or bot_globals["telegram_api_hash"] == ""
-        ):
-            log.error(
-                "<r>❌ Telegram API ID and API Hash are not set in the config file!</r>"
+
+async def process_module_account(account, bot_globals, log, group_id=None):
+    try:
+        proxy = account.get("proxy")
+        if proxy == "":
+            proxy = None
+
+        account_name = account.get("session_name")
+        web_app_data = account.get("web_app_data")
+
+        log.info(
+            f"<g>🔆 Start processing module account <c>{account_name}</c> from group <c>{group_id}</c></g>"
+        )
+
+        user_agent = account.get("user_agent")
+        if account.get("disabled"):
+            log.info(
+                f"<y>❌ Account <c>{account_name}</c> from group <c>{group_id}</c> is disabled!</y>"
             )
-            return False
+            return
 
-        disabled_sessions = load_json_file(MODULE_DISABLED_SESSIONS_FILE, [])
-        for account in accounts:
-            try:
-                if account["session_name"] in disabled_sessions:
-                    log.info(
-                        f"<y>🟨 Account {account['session_name']} is disabled!</y>"
-                    )
-                    continue
-                await process_pg_account(account, bot_globals, log)
-            except Exception as e:
-                log.error(f"<r>❌ Error processing Pyrogram account: {e}</r>")
-                continue
+        if not web_app_data:
+            log.error(
+                f"<r>❌ Account <c>{account_name}</c> from group <c>{group_id}</c> WebApp data is empty!</r>"
+            )
+            return
 
-        return True
+        tg_tmp = tgAccount()
+        web_app_query = tg_tmp.getTGWebQuery(web_app_data)
+        if not web_app_query:
+            log.error(
+                f"<r>❌ Account {account_name} from group <c>{group_id}</c> WebApp query is not valid!</r>"
+            )
+            return
+
+        fb = FarmBot(
+            log=log,
+            bot_globals=bot_globals,
+            account_name=account_name,
+            web_app_query=web_app_query,
+            proxy=proxy,
+            user_agent=user_agent,
+            isPyrogram=False,
+        )
+        await fb.run()
     except Exception as e:
-        log.error(f"<r>❌ Error processing Pyrogram accounts: {e}</r>")
+        log.error(
+            f"<r>❌ Account {account_name} from group <c>{group_id}</c> Error processing module account: {e}</r>"
+        )
         return False
+    finally:
+        log.info(
+            f"<g>✅ Module account <c>{account_name}</c> from group <c>{group_id}</c> has been processed.</g>"
+        )
 
 
-async def handle_module_accounts(accounts, bot_globals, log):
+async def handle_accounts(group_id, accounts, bot_globals, log):
     try:
         log.info(
-            f"<g>🖥️ Start processing <c>{len(accounts)}</c> module accounts ...</g>"
+            f"<g>🖥️ Starting to process group <c>{group_id}</c> with <c>{len(accounts)}</c> accounts ...</g>"
         )
-        tg_tmp = tgAccount()
+
         for account in accounts:
             try:
-                proxy = account.get("proxy")
-                if proxy == "":
-                    proxy = None
-
-                account_name = account.get("session_name")
-                web_app_data = account.get("web_app_data")
-
-                user_agent = account.get("user_agent")
-                if account.get("disabled"):
-                    log.info(f"<y>❌ Account {account_name} is disabled!</y>")
-                    continue
-
-                if not web_app_data:
-                    log.error(f"<r>❌ Account {account_name} WebApp data is empty!</r>")
-                    continue
-
-                web_app_query = tg_tmp.getTGWebQuery(web_app_data)
-                if not web_app_query:
-                    log.error(
-                        f"<r>❌ Account {account_name} WebApp query is not valid!</r>"
-                    )
-                    continue
-
-                fb = FarmBot(
-                    log=log,
-                    bot_globals=bot_globals,
-                    account_name=account_name,
-                    web_app_query=web_app_query,
-                    proxy=proxy,
-                    user_agent=user_agent,
-                    isPyrogram=False,
-                )
-                await fb.run()
+                if account["is_pyrogram"]:
+                    await process_pg_account(account, bot_globals, log, group_id)
+                else:
+                    await process_module_account(account, bot_globals, log, group_id)
             except Exception as e:
-                log.error(f"<r>❌ Error processing module account: {e}</r>")
+                log.error(
+                    f"<r>❌ Error processing group <c>{group_id}</c> account: {e}</r>"
+                )
                 continue
-
-        return True
     except Exception as e:
-        log.error(f"<r>❌ Error processing module accounts: {e}</r>")
+        log.error(f"<r>❌ Error processing group <c>{group_id}</c> accounts: {e}</r>")
         return False
+    finally:
+        log.info(
+            f"<g>🔚 Group <c>{group_id}</c> with <c>{len(accounts)}</c> accounts has been processed. Waiting for other groups' tasks to finish</g>"
+        )
+
+
+def load_accounts():
+    pyrogram_accounts_count = 0
+    module_accounts_count = 0
+    all_accounts = []
+
+    try:
+        pyrogram_accounts = load_json_file(PYROGRAM_ACCOUNTS_FILE, None)
+        if pyrogram_accounts is not None:
+            pyrogram_accounts_count = len(pyrogram_accounts)
+            for account in pyrogram_accounts:
+                if account.get("disabled", False):
+                    continue
+                account["is_pyrogram"] = True
+                all_accounts.append(account)
+
+        module_accounts = load_json_file(MODULE_ACCOUNTS_FILE, None)
+        if module_accounts is not None:
+            module_accounts_count = len(module_accounts)
+            for account in module_accounts:
+                if account.get("disabled", False):
+                    continue
+
+                account["is_pyrogram"] = False
+                all_accounts.append(account)
+    except Exception as e:
+        pass
+
+    return pyrogram_accounts_count, module_accounts_count, all_accounts
+
+
+def group_by_proxy(accounts):
+    proxies = {}
+    for account in accounts:
+        proxy = account.get("proxy")
+        if proxy is None:
+            proxy = "None"
+
+        proxy_hash = hashlib.md5(proxy.encode()).hexdigest()
+
+        if proxy_hash not in proxies:
+            proxies[proxy_hash] = []
+        proxies[proxy_hash].append(account)
+
+    return proxies
 
 
 async def main():
@@ -277,23 +335,109 @@ async def main():
     while True:
         try:
             log.info("<g>🔍 Checking for accounts ...</g>")
-            pyrogram_accounts = load_json_file(PYROGRAM_ACCOUNTS_FILE, None)
-            if pyrogram_accounts is not None:
-                await handle_pyrogram_accounts(pyrogram_accounts, bot_globals, log)
-            else:
-                log.info(
-                    "<y>🟠 No Pyrogram accounts found.</y> <g>Ignore this if you are using module accounts.</g>"
-                )
-
-            module_accounts = load_json_file(MODULE_ACCOUNTS_FILE, None)
-            if module_accounts is None:
-                log.info(
-                    "<y>🟠 No module accounts found.</y> <g>Ignore this if you are using Pyrogram accounts.</g>"
-                )
+            pyrogram_accounts, module_accounts, all_accounts = load_accounts()
+            if all_accounts is None or len(all_accounts) == 0:
+                log.info("<y>🟠 No accounts found!</y>")
                 await check_cd(log)
                 continue
 
-            await handle_module_accounts(module_accounts, bot_globals, log)
+            log.info(
+                f"<g>👥 Found <c>{len(all_accounts)}</c> accounts: <c>{pyrogram_accounts}</c> Pyrogram accounts, <c>{module_accounts}</c> module accounts.</g>"
+            )
+
+            if pyrogram_accounts > 0 and (
+                bot_globals["telegram_api_id"] == 1234
+                or bot_globals["telegram_api_hash"] == ""
+            ):
+                log.error(
+                    "<r>❌ Telegram API ID and API Hash are not set in the config file!</r>"
+                )
+                return False
+
+            grouped_accounts = group_by_proxy(all_accounts)
+
+            log.info(
+                f"<g>🔄 Accounts have been grouped into <c>{len(grouped_accounts)}</c> based on their proxies. Each group will run in a separate thread.</g>"
+            )
+
+            group_id = 1
+            log.info("<g>👥 Details of account groups:</g>")
+            log.info(
+                "<g>└──────────────────────────────────────────────────────────────</g>"
+            )
+            try:
+                for _, accounts in grouped_accounts.items():
+                    first_account_proxy = accounts[0].get("proxy", "UNSET")
+                    if first_account_proxy is None or first_account_proxy == "":
+                        first_account_proxy = "UNSET"
+
+                    hide_chars = (
+                        0
+                        if first_account_proxy == "UNSET"
+                        else min(10, int(len(first_account_proxy) / 2))
+                    )
+
+                    log.info(
+                        f"<g>└─🔗 Group <c>{group_id}</c> has <c>{len(accounts)}</c> accounts with <c>{utils.hide_text(first_account_proxy,hide_chars)}</c> proxy:</g>"
+                    )
+                    for account in accounts:
+                        log.info(f"<g>│  ├─ <c>{account['session_name']}</c></g>")
+
+                    group_id += 1
+
+                    log.info(
+                        "<g>└──────────────────────────────────────────────────────────────</g>"
+                    )
+            except Exception as e:
+                log.error(f"<r>❌ Error grouping accounts: {e}</r>")
+                await check_cd(log)
+                continue
+
+            tasks = []
+            max_threads = min(
+                utilities.getConfig("max_threads", 5), len(grouped_accounts)
+            )
+            log.info(
+                f"<g>🚀 Starting to process accounts with a maximum of <c>{max_threads}</c> threads ...</g>"
+            )
+
+            await asyncio.sleep(5)
+
+            group_id = 1
+            for _, accounts in grouped_accounts.items():
+                try:
+                    if len(tasks) == max_threads:
+                        done, pending = await asyncio.wait(
+                            tasks, return_when=asyncio.FIRST_COMPLETED
+                        )
+                        tasks = [task for task in pending]
+                except Exception as e:
+                    log.error(f"<r>❌ Error waiting for tasks: {e}</r>")
+                    await asyncio.sleep(30)
+                    continue
+
+                try:
+                    task = asyncio.create_task(
+                        handle_accounts(group_id, accounts, bot_globals, log)
+                    )
+                    tasks.append(task)
+                    group_id += 1
+                except Exception as e:
+                    log.error(f"<r>❌ Error creating task: {e}</r>")
+                    await asyncio.sleep(30)
+                    continue
+
+            try:
+                if len(tasks) > 0:
+                    await asyncio.gather(*tasks)
+            except Exception as e:
+                log.error(f"<r>❌ Error waiting for tasks: {e}</r>")
+                await asyncio.sleep(30)
+                continue
+
+            log.info(
+                "<g>✅ All accounts and groups have been processed successfully. Waiting for the next check ...</g>"
+            )
             await check_cd(log)
         except Exception as e:
             log.error(f"<r>❌ Error processing Pyrogram accounts: {e}</r>")
