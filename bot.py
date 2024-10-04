@@ -251,20 +251,21 @@ def load_accounts():
     try:
         pyrogram_accounts = load_json_file(PYROGRAM_ACCOUNTS_FILE, None)
         if pyrogram_accounts is not None:
-            pyrogram_accounts_count = len(pyrogram_accounts)
             for account in pyrogram_accounts:
                 if account.get("disabled", False):
                     continue
+
+                pyrogram_accounts_count += 1
                 account["is_pyrogram"] = True
                 all_accounts.append(account)
 
         module_accounts = load_json_file(MODULE_ACCOUNTS_FILE, None)
         if module_accounts is not None:
-            module_accounts_count = len(module_accounts)
             for account in module_accounts:
                 if account.get("disabled", False):
                     continue
 
+                module_accounts_count += 1
                 account["is_pyrogram"] = False
                 all_accounts.append(account)
     except Exception as e:
