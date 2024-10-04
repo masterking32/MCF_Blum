@@ -255,7 +255,8 @@ class FarmBot:
             self.log.error(f"<r>⭕ {self.display_name} failed to login!</r>")
             return None, None
         finally:
-            random_sleep = random.randint(30, 120)
+            delay_between_accounts = getConfig("delay_between_accounts", 60)
+            random_sleep = random.randint(0, 20) + delay_between_accounts
             self.log.info(
                 f"<g>⌛ Farming for <c>{self.display_name}</c> completed. Waiting for <c>{random_sleep}</c> seconds before running the next account...</g>"
             )

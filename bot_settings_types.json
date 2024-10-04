@@ -39,6 +39,15 @@
     "description": "Some of tasks require to start other bots, should the bot automatically start them?"
   },
   {
+    "key": "delay_between_accounts",
+    "name": "Delay between accounts (seconds)",
+    "type": "range",
+    "default_value": 60,
+    "description": "How long to wait between accounts, in seconds.",
+    "min": 1,
+    "max": 1200
+  },
+  {
     "key": "check_interval",
     "name": "Check interval (seconds)",
     "type": "number",
