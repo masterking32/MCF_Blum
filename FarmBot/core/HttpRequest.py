@@ -54,8 +54,8 @@ class HttpRequest:
         valid_option_response_code=204,
         auth_header=True,
         return_headers=False,
-        retries=3,
         display_errors=True,
+        retries=3,
     ):
         try:
             url = self._fix_url(url, domain)
@@ -72,7 +72,13 @@ class HttpRequest:
                     default_headers[key] = value
 
             if send_option_request:
-                self.options(url, None, "GET", headers, valid_option_response_code)
+                self.options(
+                    url=url,
+                    method="GET",
+                    headers=headers,
+                    valid_response_code=valid_option_response_code,
+                    display_errors=display_errors,
+                )
 
             response = requests.get(
                 url=url,
@@ -89,15 +95,16 @@ class HttpRequest:
                         self.account_name, self.authToken, self.RefreshToken
                     )
                     return self.get(
-                        url,
-                        domain,
-                        headers,
-                        send_option_request,
-                        valid_response_code,
-                        valid_option_response_code,
-                        auth_header,
-                        return_headers,
-                        retries,
+                        url=url,
+                        domain=domain,
+                        headers=headers,
+                        send_option_request=send_option_request,
+                        valid_response_code=valid_response_code,
+                        valid_option_response_code=valid_option_response_code,
+                        auth_header=auth_header,
+                        return_headers=return_headers,
+                        display_errors=display_errors,
+                        retries=retries,
                     )
                 else:
                     BL.delete_auth_token(self.account_name)
@@ -119,16 +126,16 @@ class HttpRequest:
                 self.log.info(f"🟡 <y> Unable to send request, retrying...</y>")
                 time.sleep(0.5)
                 return self.get(
-                    url,
-                    domain,
-                    headers,
-                    send_option_request,
-                    valid_response_code,
-                    valid_option_response_code,
-                    auth_header,
-                    return_headers,
-                    retries - 1,
-                    display_errors,
+                    url=url,
+                    domain=domain,
+                    headers=headers,
+                    send_option_request=send_option_request,
+                    valid_response_code=valid_response_code,
+                    valid_option_response_code=valid_option_response_code,
+                    auth_header=auth_header,
+                    return_headers=return_headers,
+                    retries=retries - 1,
+                    display_errors=display_errors,
                 )
             if display_errors:
                 self.log.error(f"🔴 <red> GET Request Error: <y>{url}</y> {e}</red>")
@@ -145,8 +152,9 @@ class HttpRequest:
         valid_option_response_code=204,
         auth_header=True,
         return_headers=False,
-        retries=3,
         only_json_response=True,
+        display_errors=True,
+        retries=3,
     ):
         try:
             url = self._fix_url(url, domain)
@@ -163,7 +171,13 @@ class HttpRequest:
                     default_headers[key] = value
 
             if send_option_request:
-                self.options(url, None, "POST", headers, valid_option_response_code)
+                self.options(
+                    url=url,
+                    method="POST",
+                    headers=headers,
+                    valid_response_code=valid_option_response_code,
+                    display_errors=display_errors,
+                )
             response = None
 
             if data:
@@ -189,24 +203,27 @@ class HttpRequest:
                         self.account_name, self.authToken, self.RefreshToken
                     )
                     return self.post(
-                        url,
-                        domain,
-                        data,
-                        headers,
-                        send_option_request,
-                        valid_response_code,
-                        valid_option_response_code,
-                        auth_header,
-                        return_headers,
-                        retries,
+                        url=url,
+                        domain=domain,
+                        data=data,
+                        headers=headers,
+                        send_option_request=send_option_request,
+                        valid_response_code=valid_response_code,
+                        valid_option_response_code=valid_option_response_code,
+                        auth_header=auth_header,
+                        return_headers=return_headers,
+                        only_json_response=only_json_response,
+                        display_errors=display_errors,
+                        retries=retries,
                     )
                 else:
                     BL.delete_auth_token(self.account_name)
                     return (None, None) if return_headers else None
             elif response.status_code != valid_response_code:
-                self.log.error(
-                    f"🔴 <red> POST Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
-                )
+                if display_errors:
+                    self.log.error(
+                        f"🔴 <red> POST Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
+                    )
                 return (None, None) if return_headers else None
 
             if (
@@ -229,19 +246,22 @@ class HttpRequest:
                 self.log.info(f"🟡 <y> Unable to send request, retrying...</y>")
                 time.sleep(0.5)
                 return self.post(
-                    url,
-                    domain,
-                    data,
-                    headers,
-                    send_option_request,
-                    valid_response_code,
-                    valid_option_response_code,
-                    auth_header,
-                    return_headers,
-                    retries - 1,
+                    url=url,
+                    domain=domain,
+                    data=data,
+                    headers=headers,
+                    send_option_request=send_option_request,
+                    valid_response_code=valid_response_code,
+                    valid_option_response_code=valid_option_response_code,
+                    auth_header=auth_header,
+                    return_headers=return_headers,
+                    only_json_response=only_json_response,
+                    display_errors=display_errors,
+                    retries=retries - 1,
                 )
 
-            self.log.error(f"🔴 <red> POST Request Error: <y>{url}</y> {e}</red>")
+            if display_errors:
+                self.log.error(f"🔴 <red> POST Request Error: <y>{url}</y> {e}</red>")
             return (None, None) if return_headers else None
 
     def options(
@@ -251,6 +271,7 @@ class HttpRequest:
         method="POST",
         headers=None,
         valid_response_code=204,
+        display_errors=True,
         retries=3,
     ):
         try:
@@ -275,9 +296,10 @@ class HttpRequest:
             )
 
             if response.status_code != valid_response_code:
-                self.log.error(
-                    f"🔴 <red> OPTIONS Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
-                )
+                if display_errors:
+                    self.log.error(
+                        f"🔴 <red> OPTIONS Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
+                    )
                 return None
 
             return True
@@ -286,14 +308,18 @@ class HttpRequest:
                 self.log.info(f"🟡 <y> Unable to send option request, retrying...</y>")
                 time.sleep(0.5)
                 return self.options(
-                    url,
-                    domain,
-                    method,
-                    headers,
-                    valid_response_code,
-                    retries - 1,
+                    url=url,
+                    domain=domain,
+                    method=method,
+                    headers=headers,
+                    valid_response_code=valid_response_code,
+                    display_errors=display_errors,
+                    retries=retries - 1,
                 )
-            self.log.error(f"🔴 <red> OPTIONS Request Error: <y>{url}</y> {e}</red>")
+            if display_errors:
+                self.log.error(
+                    f"🔴 <red> OPTIONS Request Error: <y>{url}</y> {e}</red>"
+                )
             return None
 
     def _get_proxy(self):

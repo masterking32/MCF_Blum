@@ -31,6 +31,7 @@ class Wallet:
             response = self.http.get(
                 url="/api/v1/wallet/my/points/balance",
                 domain="wallet",
+                display_errors=False,
             )
 
             if response is None:

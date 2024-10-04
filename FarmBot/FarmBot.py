@@ -183,11 +183,6 @@ class FarmBot:
                         if user_balance is not None:
                             user_balance = user_balance.get("balance", 0)
 
-            game_balance = game.get_balance()
-            if game_balance is not None:
-                available_balance = game_balance.get("availableBalance", 0)
-                play_passes = game_balance.get("playPasses", 0)
-
             leaderboard = tribe.get_leaderboard()
             if tribe_my is None and leaderboard is not None:
                 self.log.info(
@@ -206,7 +201,14 @@ class FarmBot:
                 )
                 time.sleep(1)
 
+            old_game_balance = game.get_balance()
             game_balance = game.get_balance()
+            if game_balance is None:
+                game_balance = old_game_balance
+
+
+            if game_balance.get("farming") is None:
+
             wallet_balance = wallet.get_balance()
             time.sleep(3)
 
@@ -240,7 +242,11 @@ class FarmBot:
             )
             tasks_list = await tasks.claim_tasks()
 
+            old_game_balance = game.get_balance()
             game_balance = game.get_balance()
+            if game_balance is None:
+                game_balance = old_game_balance
+
             wallet_balance = wallet.get_balance()
 
             available_balance = game_balance.get("availableBalance", 0).split(".")[0]
