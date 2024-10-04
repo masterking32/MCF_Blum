@@ -449,7 +449,11 @@ class HttpRequest:
                     return False
 
                 response = response.json()
-                if response is None:
+                if (
+                    response is None
+                    or "token" not in response
+                    or "access" not in response["token"]
+                ):
                     self.log.error(f"<r>⭕ {self.account_name} failed to login!</r>")
                     return False
 

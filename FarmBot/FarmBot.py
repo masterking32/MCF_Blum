@@ -117,6 +117,7 @@ class FarmBot:
                     f"<g>🎁 Daily reward for <c>{self.display_name}</c> is not available</g>"
                 )
             elif "days" in daily_reward:
+                game.claim_daily_reward(tz_offset)
                 day_1 = daily_reward.get("days", [])
                 if len(day_1) >= 1:
                     day_1 = day_1[1]
@@ -129,7 +130,6 @@ class FarmBot:
                         f"<g>🎁 Daily reward for <c>{self.display_name}</c>: Day: <c>{ordinal}</c>, Passes: <c>{passes}</c>, Points: <c>{points}</c></g>"
                     )
                     time.sleep(1)
-                    game.claim_daily_reward(tz_offset)
                     self.log.info(
                         f"<g>🎁 Claimed daily reward for <c>{self.display_name}</c></g>"
                     )
