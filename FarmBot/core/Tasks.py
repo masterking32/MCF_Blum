@@ -151,7 +151,7 @@ class Tasks:
                 wallet_info = wallet.get_my()
                 if wallet_info is None:
                     self.log.info(
-                        f"<y>🟡 Wallet ins not connected to finish <c>{task_title}</c> task!</y>"
+                        f"<y>🟡 Wallet is not connected to finish <c>{task_title}</c> task!</y>"
                     )
                     return
             elif task_type == "SOCIAL_SUBSCRIPTION":
