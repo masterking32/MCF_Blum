@@ -402,24 +402,29 @@ async def main():
             )
 
             await asyncio.sleep(5)
-
             group_id = 1
             for _, accounts in grouped_accounts.items():
                 try:
-                    if len(tasks) == max_threads:
-                        done, pending = await asyncio.wait(
-                            tasks, return_when=asyncio.FIRST_COMPLETED
-                        )
-                        tasks = [task for task in pending]
+                    while len(tasks) >= max_threads:
+                        for task in tasks:
+                            if not task.is_alive():
+                                tasks.remove(task)
+                                break
+
+                        await asyncio.sleep(5)
+
                 except Exception as e:
                     log.error(f"<r>❌ Error waiting for tasks: {e}</r>")
                     await asyncio.sleep(30)
                     continue
 
                 try:
-                    task = asyncio.create_task(
-                        handle_accounts(group_id, accounts, bot_globals, log)
+                    task = threading.Thread(
+                        target=lambda: asyncio.run(
+                            handle_accounts(group_id, accounts, bot_globals, log)
+                        )
                     )
+                    task.start()
                     tasks.append(task)
                     group_id += 1
                 except Exception as e:
@@ -428,8 +433,8 @@ async def main():
                     continue
 
             try:
-                if len(tasks) > 0:
-                    await asyncio.gather(*tasks)
+                for task in tasks:
+                    task.join()
             except Exception as e:
                 log.error(f"<r>❌ Error waiting for tasks: {e}</r>")
                 await asyncio.sleep(30)
