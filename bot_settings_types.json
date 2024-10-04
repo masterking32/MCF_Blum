@@ -55,5 +55,14 @@
     "description": "How often to login into accounts, in seconds.",
     "min": 1800,
     "max": 28800
+  },
+  {
+    "key": "max_threads",
+    "name": "Max Threads",
+    "type": "range",
+    "default_value": 5,
+    "description": "Maximum number of threads to use for checking groups of accounts based on their proxies.",
+    "min": 1,
+    "max": 15
   }
 ]
