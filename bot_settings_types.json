@@ -15,7 +15,7 @@
     "default_value": 220,
     "description": "Maximum claim points for games, it will be randomized between Minimum and Maximum.",
     "min": 1,
-    "max": 250
+    "max": 240
   },
   {
     "key": "game_enabled",

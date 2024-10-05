@@ -148,6 +148,7 @@ class Game:
                 data=json.dumps({"gameId": gameId, "points": points}),
                 domain="game",
                 only_json_response=False,
+                display_errors=False,
             )
 
             if response is None:
@@ -213,13 +214,23 @@ class Game:
                         getConfig("game_points_min", 150),
                         getConfig("game_points_max", 220),
                     ),
-                    max(
-                        getConfig("game_points_min", 150),
-                        getConfig("game_points_max", 220),
+                    min(
+                        max(
+                            getConfig("game_points_min", 150),
+                            getConfig("game_points_max", 220),
+                        ),
+                        245,
                     ),
                 )
 
+                self.log.info(f"<g>🔃 Try to claim rewards with <c>{points}Ḅ</c></g>")
                 game_claim_request = self.claim_game(gameId, points)
+                if game_claim_request is None:
+                    self.log.info(
+                        f"<y>⭕ {self.account_name} failed to claim game, retrying ...</y>"
+                    )
+                    game_claim_request = self.claim_game(gameId, points)
+
                 if game_claim_request is None:
                     self.log.error(
                         f"<r>⭕ {self.account_name} failed to claim game!</r>"
