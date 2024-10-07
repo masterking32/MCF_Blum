@@ -63,6 +63,6 @@
     "default_value": 5,
     "description": "Maximum number of threads to use for checking groups of accounts based on their proxies.",
     "min": 1,
-    "max": 15
+    "max": 128
   }
 ]
