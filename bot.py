@@ -237,11 +237,12 @@ async def handle_accounts(group_id, accounts, bot_globals, log):
                 continue
     except Exception as e:
         log.error(f"<r>❌ Error processing group <c>{group_id}</c> accounts: {e}</r>")
-        return False
     finally:
         log.info(
             f"<g>🔚 Group <c>{group_id}</c> with <c>{len(accounts)}</c> accounts has been processed. Waiting for other groups' tasks to finish</g>"
         )
+
+    await asyncio.sleep(5)
 
 
 def load_accounts():
