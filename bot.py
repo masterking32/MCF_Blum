@@ -12,6 +12,7 @@ import asyncio
 from pathlib import Path
 import threading
 import hashlib
+import time
 
 import utilities.utilities as utilities
 from FarmBot.FarmBot import FarmBot
@@ -67,7 +68,7 @@ except Exception as e:
 
 async def check_cd(log):
     log.info(f"<y>💤 Checking again in </y><c>{CHECK_INTERVAL}</c><y> seconds ...</y>")
-    await asyncio.sleep(CHECK_INTERVAL)
+    time.sleep(CHECK_INTERVAL)
     random_wait = random.randint(60, 120)
     log.info(f"<y>💤 Random wait for </y><c>{random_wait}</c><y> seconds ...</y>")
     await asyncio.sleep(random_wait)
