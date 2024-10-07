@@ -13,7 +13,6 @@ from pathlib import Path
 import threading
 import hashlib
 
-from mcf_utils.utils import extract_tg_query_from_url
 import utilities.utilities as utilities
 from FarmBot.FarmBot import FarmBot
 
@@ -132,7 +131,7 @@ async def process_pg_account(account, bot_globals, log, group_id=None):
             )
             return
 
-        web_app_query = extract_tg_query_from_url(web_app_data)
+        web_app_query = utils.extract_tg_query_from_url(web_app_data)
         if not web_app_query:
             log.error(
                 f"<r>└─ ❌ Account <c>{account['session_name']}</c> from group <c>{group_id}</c> WebApp query is not valid!</r>"
@@ -191,7 +190,7 @@ async def process_module_account(account, bot_globals, log, group_id=None):
             )
             return
 
-        web_app_query = extract_tg_query_from_url(web_app_data)
+        web_app_query = utils.extract_tg_query_from_url(web_app_data)
         if not web_app_query:
             log.error(
                 f"<r>❌ Account {account_name} from group <c>{group_id}</c> WebApp query is not valid!</r>"
