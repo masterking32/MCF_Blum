@@ -33,9 +33,14 @@ class Tasks:
         self.bot_globals = bot_globals
         self.processed_tasks = []
         self.game = Game(self.log, self.http, self.account_name)
+        self.total_recheck = 0
 
     async def claim_tasks(self):
         try:
+            if self.total_recheck > 3:
+                return False
+
+            self.total_recheck += 1
             self.recheck_claim = False
             self.log.info(
                 f"<g>📃 Claiming tasks for account <cyan>{self.account_name}</cyan>...</g>"

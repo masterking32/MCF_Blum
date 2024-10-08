@@ -100,6 +100,9 @@ class FarmBot:
             )
 
             wallet = Wallet(self.log, self.http, self.account_name)
+            self.log.info(
+                f"<g>💳 Checking wallet for <c>{self.display_name}</c>...</g>"
+            )
             wallet_info = wallet.get_my()
             if wallet_info is None:
                 self.log.info(
@@ -110,6 +113,9 @@ class FarmBot:
                     f"<g>💳 The wallet is connected to {self.display_name}</g>"
                 )
 
+            self.log.info(
+                f"<g>🎁 Checking daily reward for <c>{self.display_name}</c>...</g>"
+            )
             tz_offset = str(get_tz_offset())
             daily_reward = game.get_daily_reward(tz_offset)
             if daily_reward is None:
@@ -143,6 +149,7 @@ class FarmBot:
             # if wallet_balance is None:
             #     return
 
+            self.log.info(f"<g>🏞️ Checking tribe for <c>{self.display_name}</c>...</g>")
             tribe = Tribe(self.log, self.http, self.account_name)
             tribe_my = tribe.get_my()
             if tribe_my is None:
@@ -159,7 +166,7 @@ class FarmBot:
                 user_invites = user_balance.get("usedInvitation", 0)
                 user_amountForClaim = 0
                 try:
-                    user_amountForClaim = int(user_balance.get("amountForClaim", "0"))
+                    user_amountForClaim = float(user_balance.get("amountForClaim", "0"))
                 except:
                     user_amountForClaim = 0
 
@@ -170,13 +177,13 @@ class FarmBot:
                 if (
                     user_invites > 0
                     and user_balance.get("canClaim", False)
-                    and user_amountForClaim > 0
+                    and user_amountForClaim > 1
                 ):
                     user_claim = user.claim_friend_invite()
                     if user_claim is not None and "claimBalance" in user_claim:
-                        claim_balance = user_claim.get("claimBalance", 0)
+                        claim_balance = float(user_claim.get("claimBalance", "0"))
                         self.log.info(
-                            f"<g>👥 Claimed <c>{user_amountForClaim}</c> invites, new balance: <c>{user_amountForClaim}Ḅ</c></g>"
+                            f"<g>👥 Claimed balance: <c>{claim_balance}Ḅ</c> from friends!</g>"
                         )
 
                         user_balance = user.get_balance()
@@ -237,7 +244,8 @@ class FarmBot:
                 self.tgAccount,
                 license_key,
             )
-            tasks_list = await tasks.claim_tasks()
+
+            await tasks.claim_tasks()
 
             old_game_balance = game.get_balance()
             game_balance = game.get_balance()
