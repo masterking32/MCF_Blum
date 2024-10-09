@@ -250,12 +250,16 @@ def load_accounts():
     pyrogram_accounts_count = 0
     module_accounts_count = 0
     all_accounts = []
+    disabled_accounts = load_json_file(MODULE_DISABLED_SESSIONS_FILE, [])
 
     try:
         pyrogram_accounts = load_json_file(PYROGRAM_ACCOUNTS_FILE, None)
         if pyrogram_accounts is not None:
             for account in pyrogram_accounts:
                 if account.get("disabled", False):
+                    continue
+
+                if account["session_name"] in disabled_accounts:
                     continue
 
                 pyrogram_accounts_count += 1
