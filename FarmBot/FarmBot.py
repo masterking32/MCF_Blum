@@ -229,8 +229,18 @@ class FarmBot:
                 f"<g>💰 Balance for <c>{self.display_name}</c>: Available balance: <c>{available_balance}Ḅ</c>, Play passes: <c>{play_passes}</c> 🎮</g>"
             )
 
+            drop_dogs = self.allow_drop_dogs()
+            if drop_dogs:
+                self.log.info(
+                    f"<g>🐕 Drop dogs for <c>{self.account_name}</c> is available!</g>"
+                )
+            else:
+                self.log.info(
+                    f"<g>🐕 Drop dogs for <c>{self.account_name}</c> is not available!</g>"
+                )
+
             if getConfig("game_enabled", True) and play_passes > 0:
-                game.play_passes(play_passes)
+                game.play_passes(play_passes, drop_dogs)
 
             if not getConfig("task_enabled", True):
                 return

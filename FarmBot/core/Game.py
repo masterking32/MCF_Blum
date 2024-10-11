@@ -176,7 +176,7 @@ class Game:
             self.log.error(f"<r>⭕ {e} failed to claim game!</r>")
             return
 
-    def play_passes(self, games_count):
+    def play_passes(self, games_count, drop_dogs=False):
         return
         try:
             if games_count == 0:
@@ -199,16 +199,6 @@ class Game:
                 )
 
                 time.sleep(random_sleep)
-
-                drop_dogs = self.allow_drop_dogs()
-                if drop_dogs:
-                    self.log.info(
-                        f"<g>🐕 Drop dogs for <c>{self.account_name}</c> is available!</g>"
-                    )
-                else:
-                    self.log.info(
-                        f"<g>🐕 Drop dogs for <c>{self.account_name}</c> is not available!</g>"
-                    )
 
                 game_play_request = self.play_game()
                 if game_play_request is None:
