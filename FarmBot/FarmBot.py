@@ -229,7 +229,7 @@ class FarmBot:
                 f"<g>💰 Balance for <c>{self.display_name}</c>: Available balance: <c>{available_balance}Ḅ</c>, Play passes: <c>{play_passes}</c> 🎮</g>"
             )
 
-            drop_dogs = self.allow_drop_dogs()
+            drop_dogs = game.allow_drop_dogs()
             if drop_dogs:
                 self.log.info(
                     f"<g>🐕 Drop dogs for <c>{self.account_name}</c> is available!</g>"
