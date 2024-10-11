@@ -34,6 +34,21 @@ class Game:
             self.log.error(f"<r>⭕ {e} failed to get game now!</r>")
             return None
 
+    def allow_drop_dogs(self):
+        response = self.http.get(
+            url="/api/v2/game/eligibility/dogs_drop",
+            domain="game",
+        )
+
+        if response is None:
+            self.log.error(f"<r>⭕ {self.account_name} failed to get dogs drop!</r>")
+            return False
+
+        if "eligible" in response and response.get("eligible", False):
+            return True
+
+        return False
+
     def get_balance(self):
         try:
             response = self.http.get(
@@ -128,7 +143,7 @@ class Game:
     def play_game(self):
         try:
             response = self.http.post(
-                url="/api/v1/game/play",
+                url="/api/v2/game/play",
                 domain="game",
             )
 
@@ -144,7 +159,7 @@ class Game:
     def claim_game(self, gameId, points):
         try:
             response = self.http.post(
-                url="/api/v1/game/claim",
+                url="/api/v2/game/claim",
                 data=json.dumps({"gameId": gameId, "points": points}),
                 domain="game",
                 only_json_response=False,
@@ -162,6 +177,7 @@ class Game:
             return
 
     def play_passes(self, games_count):
+        return
         try:
             if games_count == 0:
                 return None
@@ -183,6 +199,16 @@ class Game:
                 )
 
                 time.sleep(random_sleep)
+
+                drop_dogs = self.allow_drop_dogs()
+                if drop_dogs:
+                    self.log.info(
+                        f"<g>🐕 Drop dogs for <c>{self.account_name}</c> is available!</g>"
+                    )
+                else:
+                    self.log.info(
+                        f"<g>🐕 Drop dogs for <c>{self.account_name}</c> is not available!</g>"
+                    )
 
                 game_play_request = self.play_game()
                 if game_play_request is None:
