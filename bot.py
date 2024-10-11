@@ -87,7 +87,7 @@ def load_json_file(file_path, default=None):
         if not os.path.exists(file_path):
             return default
 
-        with open(file_path, "r") as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             json_result = json.load(f)
             if not json_result or len(json_result) == 0:
                 return default
