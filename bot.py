@@ -334,18 +334,14 @@ async def main():
     bot_globals["license"] = license_key
     bot_globals["config"] = cfg.config
     apiObj = MCF_API(log)
-    modules = apiObj.get_modules(license_key)
+    modules = apiObj.get_user_modules(license_key)
 
     if modules is None or "error" in modules:
         log.error(f"<r>❌ Unable to get modules: {modules['error']}</r>")
         exit(1)
 
-    if "modules" not in modules:
-        log.error("<r>❌ Unable to get modules: Modules key not found!</r>")
-        exit(1)
-
     module_found = False
-    for module in modules["modules"]:
+    for module in modules:
         if module["name"] == module_name:
             module_found = True
             break
