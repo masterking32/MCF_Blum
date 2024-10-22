@@ -282,7 +282,7 @@ async def handle_accounts(group_id, accounts, bot_globals, log):
                 )
                 if not module_status:
                     log.error(
-                        f"<r>❌ Module <c>{bot_globals['module_name']}</c> API has been changed. This module requires developer's attention. Please wait for an update.</r>"
+                        f"<r>❌ Module <c>{bot_globals['module_name']}</c> API has been changed. Please wait for an update.</r>"
                     )
                     return
 
