@@ -172,30 +172,34 @@ class Tasks:
 
                     channel_url = socialSubscription.get("url", "")
 
-                    if channel_url != "" and (
-                        "t.me" in channel_url or "@" in channel_url
-                    ):
-                        try:
-                            channel_url = (
-                                channel_url.replace("https://t.me/", "")
-                                .replace("@", "")
-                                .replace("boost/", "")
-                            )
+                    if channel_url == "":
+                        return
 
-                            channel_url = (
-                                channel_url.split("/")[0]
-                                if "/" in channel_url
-                                else channel_url
-                            )
+                    if "me/+" not in channel_url:
+                        channel_url = (
+                            channel_url.replace("https://t.me/", "")
+                            .replace("@", "")
+                            .replace("boost/", "")
+                        )
 
-                            await self.tgAccount.joinChat(
-                                channel_url,
-                            )
-                            self.log.info(
-                                f"<g>✅ Joined Telegram Group/Channel <c>{task_title}</c> successfully!</g>"
-                            )
-                        except Exception as e:
-                            pass
+                        channel_url = (
+                            channel_url.split("/")[0]
+                            if "/" in channel_url
+                            else channel_url
+                        )
+
+                    if channel_url == "":
+                        return
+
+                    try:
+                        await self.tgAccount.joinChat(
+                            channel_url,
+                        )
+                        self.log.info(
+                            f"<g>✅ Joined Telegram Group/Channel <c>{task_title}</c> successfully!</g>"
+                        )
+                    except Exception as e:
+                        pass
             elif task_type == "APPLICATION_LAUNCH":
                 if not getConfig("allow_start_other_bots", True):
                     self.log.info(
