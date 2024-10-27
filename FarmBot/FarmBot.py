@@ -68,6 +68,8 @@ class FarmBot:
             if access_token is None:
                 return
 
+            license_key = self.bot_globals.get("license", None)
+
             self.http.authToken = access_token
             self.http.RefreshToken = refresh_token
 
@@ -83,7 +85,7 @@ class FarmBot:
                 f"<g>👤 User info for <c>{self.display_name}</c>: ID: <c>{hide_text(user_id, 2)}</c>, Username: <c>{hide_text(username, 3)}</c></g>"
             )
 
-            game = Game(self.log, self.http, self.account_name)
+            game = Game(self.log, self.http, self.account_name, license_key)
             now = game.get_now()
             if now is None:
                 return
@@ -245,7 +247,6 @@ class FarmBot:
             if not getConfig("task_enabled", True):
                 return
 
-            license_key = self.bot_globals.get("license", None)
             tasks = Tasks(
                 self.log,
                 self.http,

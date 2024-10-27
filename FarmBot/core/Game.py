@@ -9,13 +9,15 @@ import random
 from utilities.utilities import getConfig
 import time
 from .Wallet import Wallet
+from mcf_utils.api import API
 
 
 class Game:
-    def __init__(self, log, httpRequest, account_name):
+    def __init__(self, log, httpRequest, account_name, license_key=None):
         self.log = log
         self.http = httpRequest
         self.account_name = account_name
+        self.license_key = license_key
 
     def get_now(self):
         try:
@@ -156,11 +158,11 @@ class Game:
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to send play passes!</r>")
 
-    def claim_game(self, gameId, points):
+    def claim_game(self, payload):
         try:
             response = self.http.post(
                 url="/api/v2/game/claim",
-                data=json.dumps({"gameId": gameId, "points": points}),
+                data=json.dumps({"payload": payload}),
                 domain="game",
                 only_json_response=False,
                 display_errors=False,
@@ -177,13 +179,12 @@ class Game:
             return
 
     def play_passes(self, games_count, drop_dogs=False):
-        return
         try:
             if games_count == 0:
                 return None
 
             games_count_to_play = random.randint(
-                min(4, games_count), min(games_count, 6)
+                min(6, games_count), min(games_count, 10)
             )
             self.log.info(
                 f"<g>🎮 We are playing <c>{games_count_to_play}</c> games of <c>{games_count}</c> your games for <c>{self.account_name}</c> ...</g>"
@@ -201,6 +202,7 @@ class Game:
                 time.sleep(random_sleep)
 
                 game_play_request = self.play_game()
+
                 if game_play_request is None:
                     self.log.error(
                         f"<r>⭕ {self.account_name} failed to play game!</r>"
@@ -214,6 +216,34 @@ class Game:
                     )
                     continue
 
+                assets = game_play_request.get("assets", None)
+                if assets is None:
+                    self.log.error(
+                        f"<r>⭕ {self.account_name} failed to play game!</r>"
+                    )
+                    continue
+
+                dogs = assets.get("DOGS", None)
+                points = random.randint(
+                    min(
+                        getConfig("game_points_min", 150),
+                        getConfig("game_points_max", 245),
+                    ),
+                    min(
+                        max(
+                            getConfig("game_points_min", 150),
+                            getConfig("game_points_max", 245),
+                        ),
+                        245,
+                    ),
+                )
+
+                post_data = {"game_id": gameId, "clover": points}
+                if dogs is not None:
+                    post_data["clover"] = points - random.randint(10, 30)
+                    post_data["dogs"] = round(random.uniform(0.4, 0.8), 1)
+                    dogs = post_data["dogs"]
+
                 self.log.info(f"<g>🎮 Game Id: <c>{gameId}</c> has started</g>")
 
                 random_sleep = random.randint(30, 38)
@@ -225,27 +255,36 @@ class Game:
                 sleep_time = random_sleep
                 time.sleep(sleep_time)
 
-                points = random.randint(
-                    min(
-                        getConfig("game_points_min", 150),
-                        getConfig("game_points_max", 220),
-                    ),
-                    min(
-                        max(
-                            getConfig("game_points_min", 150),
-                            getConfig("game_points_max", 220),
-                        ),
-                        245,
-                    ),
-                )
+                if dogs is not None:
+                    self.log.info(
+                        f"<g>🔃 Try to claim rewards with <c>{dogs} DOGS</c> and <c>{points}Ḅ</c>...</g>"
+                    )
+                else:
+                    self.log.info(
+                        f"<g>🔃 Try to claim rewards with <c>{points}Ḅ</c></g>"
+                    )
 
-                self.log.info(f"<g>🔃 Try to claim rewards with <c>{points}Ḅ</c></g>")
-                game_claim_request = self.claim_game(gameId, points)
+                response = self.get_api_data(post_data)
+                if response is None:
+                    self.log.error(
+                        f"<r>⭕ {self.account_name} failed to claim game!</r>"
+                    )
+                    return None
+
+                if "payload" not in response:
+                    self.log.error(
+                        f"<r>⭕ {self.account_name} failed to claim game!</r>"
+                    )
+                    return None
+
+                payload = response.get("payload")
+
+                game_claim_request = self.claim_game(payload)
                 if game_claim_request is None:
                     self.log.info(
                         f"<y>⭕ {self.account_name} failed to claim game, retrying ...</y>"
                     )
-                    game_claim_request = self.claim_game(gameId, points)
+                    game_claim_request = self.claim_game(payload)
 
                 if game_claim_request is None:
                     self.log.error(
@@ -253,9 +292,14 @@ class Game:
                     )
                     return None
 
-                self.log.info(
-                    f"<g>🎮 Game claimed successfully, points: (<c>+{points}Ḅ</c>)</g>"
-                )
+                if dogs is not None:
+                    self.log.info(
+                        f"<g>🎮 Game claimed successfully, points: (<c>+{points}Ḅ</c>), DOGS: (<c>+{dogs} DOGS</c>)</g>"
+                    )
+                else:
+                    self.log.info(
+                        f"<g>🎮 Game claimed successfully, points: (<c>+{points}Ḅ</c>)</g>"
+                    )
 
             balance = self.get_balance()
             if balance is None:
@@ -271,4 +315,32 @@ class Game:
 
         except Exception as e:
             self.log.error(f"<r>⭕ {e} failed to play passes!</r>")
+            return None
+
+    def get_api_data(self, data):
+        if self.license_key is None:
+            return None
+
+        apiObj = API(self.log)
+        data["game_name"] = "blum"
+        data["action"] = "get_task"
+        data["task_type"] = "get_games_payload"
+        response = apiObj.get_task_answer(self.license_key, data)
+        time.sleep(3)
+        if "error" in response:
+            self.log.error(f"<y>⭕ API Error: {response['error']}</y>")
+            return None
+        elif "status" in response and response["status"] == "success":
+            return response
+        elif (
+            "status" in response
+            and response["status"] == "error"
+            and "message" in response
+        ):
+            self.log.info(f"<y>🟡 {response['message']}</y>")
+            return None
+        else:
+            self.log.error(
+                f"<y>🟡 Unable to get task answer, please try again later</y>"
+            )
             return None
