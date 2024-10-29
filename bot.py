@@ -84,7 +84,7 @@ BOT_ID = "blumcryptobot"
 REFERRAL_TOKEN = "ref_Gl4KRgUmpb"
 SHORT_APP_NAME = "app"
 APP_URL = None
-VERSION_HASH = "097b8e37d2f1bda78bc2c6d9d21a130c"
+VERSION_HASH = "1735f071b5cdd869610b36760f990359"
 # End of variables to edit
 
 
