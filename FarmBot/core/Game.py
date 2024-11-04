@@ -179,6 +179,7 @@ class Game:
             return
 
     def play_passes(self, games_count, drop_dogs=False):
+        return
         try:
             if games_count == 0:
                 return None
