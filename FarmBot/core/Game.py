@@ -239,7 +239,7 @@ class Game:
                 )
 
                 # halloween event
-                points = points + (random.randint(2, 5) * 10)
+                # points = points + (random.randint(2, 5) * 10)
 
                 post_data = {"game_id": gameId, "clover": points}
                 if dogs is not None:
