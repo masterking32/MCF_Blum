@@ -2,7 +2,7 @@ import {
   _ as o
 } from "./CUHsmnAE.js";
 import {
-  j as t,f
+  j as t,
   a as c,
   c as r,
   k as _
@@ -19,9 +19,6 @@ const a = {},
 
 function n(m, p) {
   const e = o;
-
-
-  test
   return c(), r("div", s, [_(e)])
 }
 const k = t(a, [
