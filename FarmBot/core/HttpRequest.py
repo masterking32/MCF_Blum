@@ -267,6 +267,131 @@ class HttpRequest:
                 self.log.error(f"🔴 <red> POST Request Error: <y>{url}</y> {e}</red>")
             return (None, None) if return_headers else None
 
+    def delete(
+        self,
+        url,
+        domain="game",
+        data=None,
+        headers=None,
+        send_option_request=True,
+        valid_response_code=200,
+        valid_option_response_code=204,
+        auth_header=True,
+        return_headers=False,
+        only_json_response=True,
+        display_errors=True,
+        retries=3,
+    ):
+        try:
+            url = self._fix_url(url, domain)
+            default_headers = self._get_default_headers() if "blum.codes" in url else {}
+
+            if headers is None:
+                headers = {}
+
+            if auth_header and self.authToken is not None:
+                headers["authorization"] = f"Bearer {self.authToken}"
+
+            if headers:
+                for key, value in headers.items():
+                    default_headers[key] = value
+
+            if send_option_request:
+                self.options(
+                    url=url,
+                    method="DELETE",
+                    headers=headers,
+                    valid_response_code=valid_option_response_code,
+                    display_errors=display_errors,
+                )
+            response = None
+
+            if data:
+                response = requests.delete(
+                    url=url,
+                    headers=default_headers,
+                    data=data,
+                    proxies=self._get_proxy(),
+                    timeout=30,
+                )
+            else:
+                response = requests.delete(
+                    url=url,
+                    headers=default_headers,
+                    proxies=self._get_proxy(),
+                    timeout=30,
+                )
+
+            if response.status_code == 401:
+                if self.renew_access_token():
+                    self.log.info(
+                        "🟡 <y>Retrying request after renewing access token...</y>"
+                    )
+                    BL.save_auth_token(
+                        self.account_name, self.authToken, self.RefreshToken
+                    )
+                    return self.delete(
+                        url=url,
+                        domain=domain,
+                        data=data,
+                        headers=headers,
+                        send_option_request=send_option_request,
+                        valid_response_code=valid_response_code,
+                        valid_option_response_code=valid_option_response_code,
+                        auth_header=auth_header,
+                        return_headers=return_headers,
+                        only_json_response=only_json_response,
+                        display_errors=display_errors,
+                        retries=retries,
+                    )
+                else:
+                    BL.delete_auth_token(self.account_name)
+                    return (None, None) if return_headers else None
+            elif response.status_code != valid_response_code:
+                if display_errors:
+                    self.log.error(
+                        f"🔴 <red> DELETE Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
+                    )
+                return (None, None) if return_headers else None
+
+            if (
+                "application/json" not in response.headers.get("Content-Type", "")
+                and only_json_response is False
+            ):
+                return (
+                    (response.text, response.headers)
+                    if return_headers
+                    else response.text
+                )
+
+            return (
+                (response.json(), response.headers)
+                if return_headers
+                else response.json()
+            )
+        except Exception as e:
+            if retries > 0:
+                self.log.info(f"🟡 <y> Unable to send request, retrying...</y>")
+                time.sleep(0.5)
+                return self.delete(
+                    url=url,
+                    domain=domain,
+                    data=data,
+                    headers=headers,
+                    send_option_request=send_option_request,
+                    valid_response_code=valid_response_code,
+                    valid_option_response_code=valid_option_response_code,
+                    auth_header=auth_header,
+                    return_headers=return_headers,
+                    only_json_response=only_json_response,
+                    display_errors=display_errors,
+                    retries=retries - 1,
+                )
+
+            if display_errors:
+                self.log.error(f"🔴 <red> DELETE Request Error: <y>{url}</y> {e}</red>")
+            return (None, None) if return_headers else None
+
     def options(
         self,
         url,
