@@ -32,6 +32,13 @@
     "description": "Should the bot automatically do tasks for you?"
   },
   {
+    "key": "allow_join_channels",
+    "name": "Tasks [Auto Join Channels]",
+    "type": "checkbox",
+    "default_value": "on",
+    "description": "Some of tasks require to join channels, should the bot automatically join them?"
+  },
+  {
     "key": "allow_start_other_bots",
     "name": "Tasks [Auto Start Bots]",
     "type": "checkbox",
