@@ -160,6 +160,11 @@ class Tasks:
                     )
                     return
             elif task_type == "SOCIAL_SUBSCRIPTION":
+                if not getConfig("allow_join_channels", True):
+                    self.log.info(
+                        f"<y>🟡 'Auto Join Channels' is disabled. Skipping the task <c>{task_title}</c>.</y>"
+                    )
+                    return
                 socialSubscription = task.get("socialSubscription", {})
                 if (
                     "openInTelegram" in socialSubscription
