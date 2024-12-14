@@ -5,7 +5,7 @@
 
 import json
 import time
-import requests
+import cloudscraper
 import utilities.BL as BL
 
 
@@ -44,6 +44,8 @@ class HttpRequest:
                 "🟡 <y>Windows User Agent detected, For safety please use mobile user-agent</y>"
             )
 
+        self.scraper = cloudscraper.create_scraper()
+
     def get(
         self,
         url,
@@ -80,13 +82,12 @@ class HttpRequest:
                     display_errors=display_errors,
                 )
 
-            response = requests.get(
+            response = self.scraper.get(
                 url=url,
                 headers=default_headers,
                 proxies=self._get_proxy(),
                 timeout=30,
             )
-
             if response.status_code == 401:
                 if self.renew_access_token():
                     self.log.info(
@@ -182,7 +183,7 @@ class HttpRequest:
             response = None
 
             if data:
-                response = requests.post(
+                response = self.scraper.post(
                     url=url,
                     headers=default_headers,
                     data=data,
@@ -190,7 +191,7 @@ class HttpRequest:
                     timeout=30,
                 )
             else:
-                response = requests.post(
+                response = self.scraper.post(
                     url=url,
                     headers=default_headers,
                     proxies=self._get_proxy(),
@@ -307,7 +308,7 @@ class HttpRequest:
             response = None
 
             if data:
-                response = requests.delete(
+                response = self.scraper.delete(
                     url=url,
                     headers=default_headers,
                     data=data,
@@ -315,7 +316,7 @@ class HttpRequest:
                     timeout=30,
                 )
             else:
-                response = requests.delete(
+                response = self.scraper.delete(
                     url=url,
                     headers=default_headers,
                     proxies=self._get_proxy(),
@@ -417,7 +418,7 @@ class HttpRequest:
                 for key, value in headers.items():
                     default_headers[key] = value
 
-            response = requests.options(
+            response = self.scraper.options(
                 url=url,
                 headers=default_headers,
                 proxies=self._get_proxy(),
@@ -472,24 +473,24 @@ class HttpRequest:
 
     def _get_default_headers(self):
         headers = {
-            "accept": "application/json, text/plain, */*",
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Encoding": "gzip, deflate",
+            "Accept-Language": "en-US,en;q=0.9",
             "Origin": "https://telegram.blum.codes",
             "Sec-Fetch-Dest": "empty",
             "Sec-Fetch-Mode": "cors",
             "Sec-Fetch-Site": "same-site",
             "User-Agent": self.user_agent,
-            "pragma": "u=1, i",
+            "Priority": "u=1, i",
             "Lang": "en",
-            "cache-control": "no-cache",
             "Content-Type": "application/json",
         }
-
         if "android" in self.user_agent.lower():
-            headers["Sec-CH-UA-Platform"] = '"Android"'
-            headers["Sec-CH-UA-Mobile"] = "?1"
-            headers["Sec-CH-UA"] = (
-                '"Chromium";v="128", "Not;A=Brand";v="24", "Android WebView";v="128"'
-            )
+            headers["Sec-Ch-Ua-platform"] = '"Android"'
+            headers["Sec-Ch-Ua-mobile"] = "?1"
+            # headers["Sec-CH-UA"] = (
+            #     '"Chromium";v="128", "Not;A=Brand";v="24", "Android WebView";v="128"'
+            # )
             headers["X-Requested-With"] = "org.telegram.messenger"
 
         return headers
@@ -497,13 +498,14 @@ class HttpRequest:
     def _get_get_option_headers(self, headers=None, method="GET"):
         default_headers = {
             "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate",
+            "Accept-Language": "en-US,en;q=0.9",
             "Origin": "https://telegram.blum.codes",
             "Sec-Fetch-Dest": "empty",
             "Sec-Fetch-Mode": "cors",
             "Sec-Fetch-Site": "same-site",
             "User-Agent": self.user_agent,
-            "pragma": "u=1, i",
-            "cache-control": "no-cache",
+            "Priority": "u=1, i",
             "access-control-request-method": method,
             "access-control-request-headers": "lang",
         }
@@ -532,7 +534,7 @@ class HttpRequest:
         option_headers["access-control-request-headers"] = "content-type,lang"
         proxy = self._get_proxy()
 
-        option_response = requests.options(
+        option_response = self.scraper.options(
             url=url,
             headers=option_headers,
             proxies=proxy,
@@ -545,7 +547,7 @@ class HttpRequest:
             )
             return False
 
-        response = requests.post(
+        response = self.scraper.post(
             url=url,
             headers=headers,
             data=json.dumps({"refresh": self.RefreshToken}),
@@ -562,7 +564,7 @@ class HttpRequest:
                 url = self._fix_url(
                     "/api/v1/auth/provider/PROVIDER_TELEGRAM_MINI_APP", "user"
                 )
-                response = requests.post(
+                response = self.scraper.post(
                     url=url,
                     headers=headers,
                     data=json.dumps(
