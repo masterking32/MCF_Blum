@@ -49,6 +49,7 @@ class FarmBot:
         self.http = None
 
     async def run(self):
+        self.log.info(f"<r>❌ WE NO LONGER SUPPORT THIS MODULE!</r>")
         return
         self.display_name = self.account_name.replace("ma_", "")
         self.log.info(
