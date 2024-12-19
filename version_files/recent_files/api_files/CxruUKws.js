@@ -1,0 +1,144 @@
+import {
+  _ as C
+} from "./B-7HzDkL.js";
+import {
+  d as g,
+  j as l,
+  aS as $,
+  z as v,
+  aU as b,
+  bn as w,
+  ao as j,
+  a5 as A,
+  o as a,
+  c as t,
+  a as c,
+  e as o,
+  t as i,
+  n as L,
+  aV as B,
+  C as k,
+  aY as S,
+  f as T,
+  F as y,
+  q as f,
+  b as _,
+  J as U
+} from "./DQp58DI6.js";
+const N = {
+    class: "memepad-jetton-transaction"
+  },
+  V = {
+    class: "user-avatar-wrapper"
+  },
+  I = ["src"],
+  z = ["src"],
+  D = {
+    class: "content"
+  },
+  F = {
+    key: 0,
+    class: "user-name"
+  },
+  J = {
+    key: 1,
+    class: "user-address"
+  },
+  R = {
+    class: "event-data"
+  },
+  W = {
+    class: "time"
+  },
+  q = {
+    class: "values"
+  },
+  E = {
+    key: 0,
+    class: "ton-price"
+  },
+  K = {
+    key: 1,
+    class: "amount"
+  },
+  M = g({
+    __name: "Transaction",
+    props: {
+      transaction: {}
+    },
+    setup(p) {
+      const e = p,
+        u = l(() => {
+          const s = $(e.transaction.timestamp);
+          return s.isDate ? s.label : v("base.time.ago", {
+            time: s.label
+          })
+        }),
+        n = l(() => v(`memepad.jetton.transactions.type.${e.transaction.type.toLowerCase()}`)),
+        m = l(() => b(w(e.transaction.user.address))),
+        d = j(`avatars/${A(0,9)}`, "webp");
+      return (s, r) => (a(), t("div", N, [c("div", V, [s.transaction.user.avatarUrl ? (a(), t("img", {
+        key: 0,
+        src: s.transaction.user.avatarUrl,
+        alt: "User avatar",
+        class: "user-avatar"
+      }, null, 8, I)) : (a(), t("img", {
+        key: 1,
+        src: o(d),
+        class: "user-avatar-empty"
+      }, null, 8, z))]), c("div", D, [s.transaction.user.nickname ? (a(), t("div", F, i(s.transaction.user.nickname), 1)) : (a(), t("div", J, i(o(m)), 1)), c("div", R, [c("div", {
+        class: L(["type", `is-${s.transaction.type.toLowerCase()}`])
+      }, i(o(n)), 3), c("div", W, i(o(u)), 1)])]), c("div", q, [s.transaction.amount ? (a(), t("div", E, i(`${("formatTon"in s?s.formatTon:o(B))(s.transaction.amount,2)} TON`), 1)) : k("", !0), s.transaction.jettonAmount ? (a(), t("div", K, i(`${("formatCount"in s?s.formatCount:o(S))(s.transaction.jettonAmount).full} ${s.transaction.ticker}`), 1)) : k("", !0)])]))
+    }
+  }),
+  O = T(M, [
+    ["__scopeId", "data-v-2192a0aa"]
+  ]),
+  P = {
+    class: "memepad-jetton-page-transactions"
+  },
+  h = 2,
+  Y = g({
+    __name: "Transactions",
+    props: {
+      transactions: {},
+      preview: {
+        type: Boolean
+      }
+    },
+    setup(p) {
+      const e = p,
+        u = l(() => {
+          var n, m;
+          return e.preview ? (n = e.transactions) == null ? void 0 : n.transactions.slice(0, h) : (m = e.transactions) == null ? void 0 : m.transactions
+        });
+      return (n, m) => {
+        const d = C,
+          s = O;
+        return a(), t("div", P, [n.transactions ? (a(!0), t(y, {
+          key: 1
+        }, f(o(u), r => (a(), U(s, {
+          key: r.user.address + r.timestamp,
+          transaction: r
+        }, null, 8, ["transaction"]))), 128)) : (a(!0), t(y, {
+          key: 0
+        }, f(n.preview ? h : 6, r => (a(), t("div", {
+          key: r,
+          class: "skeleton"
+        }, [_(d, {
+          class: "image",
+          rounded: ""
+        }), _(d, {
+          class: "title"
+        }), _(d, {
+          class: "value"
+        })]))), 128))])
+      }
+    }
+  }),
+  Q = T(Y, [
+    ["__scopeId", "data-v-82c86ec4"]
+  ]);
+export {
+  Q as _
+};
