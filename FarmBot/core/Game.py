@@ -75,12 +75,11 @@ class Game:
             self.log.error(f"<r>⭕ {e} failed to get balance!</r>")
             return None
 
-    def get_daily_reward(self, timezone_offset):
+    def get_daily_reward(self):
         try:
             response = self.http.get(
-                url="/api/v1/daily-reward?offset=" + timezone_offset,
+                url="/api/v2/daily-reward",
                 domain="game",
-                display_errors=False,
             )
 
             if response is None:
@@ -92,12 +91,11 @@ class Game:
             self.log.error(f"<r>⭕ {e} failed to get daily reward!</r>")
             return None
 
-    def claim_daily_reward(self, timezone_offset):
+    def claim_daily_reward(self):
         try:
             response = self.http.post(
-                url="/api/v1/daily-reward?offset=" + timezone_offset,
+                url="/api/v2/daily-reward",
                 domain="game",
-                only_json_response=False,
             )
 
             if response is None:

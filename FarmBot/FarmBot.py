@@ -49,8 +49,6 @@ class FarmBot:
         self.http = None
 
     async def run(self):
-        self.log.info("Review Required")
-        return
         self.display_name = self.account_name.replace("ma_", "")
         self.log.info(
             f"<g>🤖 Starting Blum farming for account <cyan>{self.display_name}</cyan>...</g>"
@@ -120,30 +118,37 @@ class FarmBot:
             self.log.info(
                 f"<g>🎁 Checking daily reward for <c>{self.display_name}</c>...</g>"
             )
-            tz_offset = str(get_tz_offset())
-            daily_reward = game.get_daily_reward(tz_offset)
-            if daily_reward is None:
-                self.log.info(
-                    f"<g>🎁 Daily reward for <c>{self.display_name}</c> is not available</g>"
-                )
-            elif "days" in daily_reward:
-                game.claim_daily_reward(tz_offset)
-                day_1 = daily_reward.get("days", [])
-                if len(day_1) >= 1:
-                    day_1 = day_1[1]
-                    ordinal = day_1.get("ordinal", 0)
-                    reward = day_1.get("reward", {})
-                    passes = reward.get("passes", 0)
-                    points = reward.get("points", 0)
 
-                    self.log.info(
-                        f"<g>🎁 Daily reward for <c>{self.display_name}</c>: Day: <c>{ordinal}</c>, Passes: <c>{passes}</c>, Points: <c>{points}</c></g>"
-                    )
+            daily_rewards = game.get_daily_reward()
+            if daily_rewards is not None:
+                claim = daily_rewards.get("claim", "Not available")
+                currentStreakDays = daily_rewards.get("currentStreakDays", 0)
+                todayReward = daily_rewards.get(
+                    "todayReward", {"passes": 0, "points": 0}
+                )
+                canClaimAt = daily_rewards.get("canClaimAt", 0) / 1000
+                canClaimAt = time.strftime(
+                    "%Y-%m-%d %H:%M:%S", time.localtime(canClaimAt)
+                )
+
+                self.log.info(
+                    f"<g>🎁 Daily reward for <c>{self.display_name}</c>: Claim: <c>{claim}</c>, Current streak days: <c>{currentStreakDays}</c>, Today reward: (Game Passes: <c>{todayReward['passes']}</c>, Points: <c>{todayReward['points']}</c>), Can claim at: <c>{canClaimAt}</c></g>"
+                )
+
+                if claim == "available":
                     time.sleep(1)
-                    self.log.info(
-                        f"<g>🎁 Claimed daily reward for <c>{self.display_name}</c></g>"
-                    )
-                    time.sleep(1)
+
+                    game.claim_daily_reward()
+                    claim = game.get_daily_reward()
+                    if (
+                        claim is not None
+                        and "claim" in claim
+                        and claim.get("claim") == "unavailable"
+                    ):
+                        self.log.info(
+                            f"<g>🎁 Claimed daily reward for <c>{self.display_name}</c></g>"
+                        )
+                        time.sleep(1)
 
             user_balance = user.get_balance()
             # if user_balance is None:
