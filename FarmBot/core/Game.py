@@ -262,6 +262,11 @@ class Game:
                         f"<g>🔃 Try to claim rewards with <c>{points}Ḅ</c></g>"
                     )
 
+                xmas_points = points * 5
+                self.log.info(
+                    f"<g>🔃 Claiming rewards with <c>{xmas_points}Ḅ</c> due to the Christmas event...</g>"
+                )
+
                 response = self.get_api_data(post_data)
                 if response is None:
                     self.log.error(
