@@ -177,7 +177,6 @@ class Game:
             return
 
     def play_passes(self, games_count, drop_dogs=False):
-        return
         try:
             if games_count == 0:
                 return None
@@ -237,8 +236,8 @@ class Game:
                     ),
                 )
 
-                # halloween event
-                # points = points + (random.randint(2, 5) * 10)
+                # XMas event
+                points = points * 5
 
                 post_data = {"game_id": gameId, "clover": points}
                 if dogs is not None:
