@@ -236,9 +236,6 @@ class Game:
                     ),
                 )
 
-                # XMas event
-                points = points * 5
-
                 post_data = {"game_id": gameId, "clover": points}
                 if dogs is not None:
                     post_data["clover"] = points - random.randint(10, 30)
