@@ -177,7 +177,6 @@ class Game:
             return
 
     def play_passes(self, games_count, drop_dogs=False):
-        return
         try:
             if games_count == 0:
                 return None
@@ -263,7 +262,7 @@ class Game:
                         f"<g>🔃 Try to claim rewards with <c>{points}Ḅ</c></g>"
                     )
 
-                xmas_points = points * 5
+                xmas_points = points * 3
                 self.log.info(
                     f"<g>🔃 Claiming rewards with <c>{xmas_points}Ḅ</c> due to the Christmas event...</g>"
                 )
