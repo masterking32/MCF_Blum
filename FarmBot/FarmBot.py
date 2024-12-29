@@ -49,6 +49,7 @@ class FarmBot:
         self.http = None
 
     async def run(self):
+        return
         self.display_name = self.account_name.replace("ma_", "")
         self.log.info(
             f"<g>🤖 Starting Blum farming for account <cyan>{self.display_name}</cyan>...</g>"
