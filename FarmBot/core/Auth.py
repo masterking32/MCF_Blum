@@ -4,7 +4,7 @@
 # Telegram: https://t.me/MasterCryptoFarmBot
 
 import json
-from random import random
+import random
 import string
 from utilities.utilities import getConfig
 import utilities.BL as BL
