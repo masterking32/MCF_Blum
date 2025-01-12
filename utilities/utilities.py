@@ -98,3 +98,55 @@ def check_mcf_status(log, mcf_pid, module_name):
             time.sleep(1)
     except Exception as e:
         pass
+
+
+def get_display_data(file_path):
+    try:
+        with open(file_path, "r") as f:
+            data = json.load(f)
+            return data
+    except Exception as e:
+        return {}
+
+
+def save_display_data(file_path, data):
+    try:
+        with open(file_path, "w") as f:
+            json.dump(data, f)
+    except Exception as e:
+        pass
+
+
+def update_display_data(file_name, key, value):
+    file_path = os.path.join(MODULE_DIR, file_name)
+    data = get_display_data(file_path)
+    data[key] = value
+    save_display_data(file_path, data)
+    return data
+
+
+def inc_display_data(file_name, key, value):
+    file_path = os.path.join(MODULE_DIR, file_name)
+    data = get_display_data(file_path)
+    simple_data = {value.get("name"): 1, "title": value.get("title")}
+    if key in data:
+        data[key][value.get("name")] += 1
+    else:
+        data[key] = simple_data
+
+    save_display_data(file_path, data)
+    return data
+
+
+def add_account_to_display_data(file_name, session_name):
+    file_path = os.path.join(MODULE_DIR, file_name)
+    data = get_display_data(file_path)
+    if session_name not in data:
+        date = time.strftime("%Y-%m-%d %H:%M:%S")
+        data[session_name] = {"date": date}
+        save_display_data(file_path, data)
+
+
+def clear_display_data(file_name):
+    file_path = os.path.join(MODULE_DIR, file_name)
+    save_display_data(file_path, {})

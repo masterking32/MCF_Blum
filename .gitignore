@@ -7,3 +7,4 @@ accounts.json
 disabled_sessions.json
 tokens.json
 module_data.json
+display_data*.json

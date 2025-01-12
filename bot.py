@@ -177,6 +177,14 @@ async def process_pg_account(account, bot_globals, log, group_id=None):
 
         web_app_data = await tg.run()
         if not web_app_data:
+            utilities.inc_display_data(
+                "display_data.json",
+                "telegram_issues",
+                {"title": "Telegram Issues", "name": "count"},
+            )
+            utilities.add_account_to_display_data(
+                "display_data_telegram_issues.json", account["session_name"]
+            )
             log.error(
                 f"<r>└─ ❌ Account <c>{account['session_name']}</c> from group <c>{group_id}</c> is not ready! Unable to retrieve WebApp data.</r>"
             )
@@ -184,6 +192,14 @@ async def process_pg_account(account, bot_globals, log, group_id=None):
 
         web_app_query = utils.extract_tg_query_from_url(web_app_data)
         if not web_app_query:
+            utilities.add_account_to_display_data(
+                "display_data_telegram_issues.json", account["session_name"]
+            )
+            utilities.inc_display_data(
+                "display_data.json",
+                "telegram_issues",
+                {"title": "Telegram Issues", "name": "count"},
+            )
             log.error(
                 f"<r>└─ ❌ Account <c>{account['session_name']}</c> from group <c>{group_id}</c> WebApp query is not valid!</r>"
             )
@@ -316,9 +332,19 @@ def load_accounts():
         if pyrogram_accounts is not None:
             for account in pyrogram_accounts:
                 if account.get("disabled", False):
+                    utilities.inc_display_data(
+                        "display_data.json",
+                        "disabled_accounts",
+                        {"title": "Disabled Accounts", "name": "count"},
+                    )
                     continue
 
                 if account["session_name"] in disabled_accounts:
+                    utilities.inc_display_data(
+                        "display_data.json",
+                        "disabled_accounts",
+                        {"title": "Disabled Accounts", "name": "count"},
+                    )
                     continue
 
                 pyrogram_accounts_count += 1
@@ -329,6 +355,11 @@ def load_accounts():
         if module_accounts is not None:
             for account in module_accounts:
                 if account.get("disabled", False):
+                    utilities.inc_display_data(
+                        "display_data.json",
+                        "disabled_accounts",
+                        {"title": "Disabled Accounts", "name": "count"},
+                    )
                     continue
 
                 module_accounts_count += 1
@@ -421,6 +452,12 @@ async def main():
     while True:
         try:
             log.info("<g>🔍 Checking for accounts ...</g>")
+
+            utilities.clear_display_data("display_data.json")
+            utilities.clear_display_data("display_data_telegram_issues.json")
+            utilities.clear_display_data("display_data_bot_issues.json")
+            utilities.clear_display_data("display_data_success_accounts.json")
+
             pyrogram_accounts, module_accounts, all_accounts = load_accounts()
             if all_accounts is None or len(all_accounts) == 0:
                 log.info("<y>🟠 No accounts found!</y>")
@@ -429,6 +466,30 @@ async def main():
 
             log.info(
                 f"<g>👥 Found <c>{len(all_accounts)}</c> accounts: <c>{pyrogram_accounts}</c> Pyrogram/Telethon accounts, <c>{module_accounts}</c> module accounts.</g>"
+            )
+
+            utilities.update_display_data(
+                "display_data.json",
+                "active_accounts",
+                {"title": "Active Accounts", "count": len(all_accounts)},
+            )
+
+            utilities.update_display_data(
+                "display_data.json",
+                "pyrogram_accounts",
+                {"title": "Pyrogram/Telethon Accounts", "count": pyrogram_accounts},
+            )
+
+            utilities.update_display_data(
+                "display_data.json",
+                "module_accounts",
+                {"title": "Module Accounts", "count": module_accounts},
+            )
+
+            utilities.update_display_data(
+                "display_data.json",
+                "success_accounts",
+                {"title": "Successfull farm finished accounts", "count": 0},
             )
 
             if pyrogram_accounts > 0 and (
@@ -441,6 +502,18 @@ async def main():
                 return False
 
             grouped_accounts = group_by_proxy(all_accounts)
+
+            utilities.update_display_data(
+                "display_data.json",
+                "proxy_groups",
+                {"title": "Proxy Groups", "count": len(grouped_accounts)},
+            )
+
+            utilities.update_display_data(
+                "display_data.json",
+                "telegram_issues",
+                {"title": "Telegram Issues", "count": 0},
+            )
 
             log.info(
                 f"<g>🔄 Accounts have been grouped into <c>{len(grouped_accounts)}</c> based on their proxies. Each group will run in a separate thread.</g>"
