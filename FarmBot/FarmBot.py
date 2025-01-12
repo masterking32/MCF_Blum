@@ -8,7 +8,7 @@ import os
 import time
 
 from utilities.BL import get_tz_offset
-from utilities.utilities import getConfig, add_account_to_display_data
+from utilities.utilities import getConfig, add_account_to_display_data, inc_display_data
 from .core.HttpRequest import HttpRequest
 from .core.Auth import Auth
 from .core.User import User
@@ -287,6 +287,12 @@ class FarmBot:
                 self.account_name,
                 "Play passes: " + str(play_passes),
                 int(available_balance),
+            )
+
+            inc_display_data(
+                "display_data.json",
+                "success_accounts",
+                {"title": "Successfull farm finished accounts", "name": "count"},
             )
 
         except Exception as e:
