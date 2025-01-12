@@ -8,7 +8,7 @@ import os
 import time
 
 from utilities.BL import get_tz_offset
-from utilities.utilities import getConfig
+from utilities.utilities import getConfig, add_account_to_display_data
 from .core.HttpRequest import HttpRequest
 from .core.Auth import Auth
 from .core.User import User
@@ -66,6 +66,9 @@ class FarmBot:
             auth = Auth(self.log, self.http, self.account_name, self.web_app_query)
             access_token, refresh_token = auth.login()
             if access_token is None:
+                add_account_to_display_data(
+                    "display_data_bot_issues.json", self.account_name
+                )
                 return
 
             license_key = self.bot_globals.get("license", None)
@@ -277,6 +280,13 @@ class FarmBot:
 
             self.log.info(
                 f"<g>💰 Balance for <c>{self.display_name}</c>: Available balance: <c>{available_balance}Ḅ</c>, Play passes: <c>{play_passes}</c> 🎮</g>"
+            )
+
+            add_account_to_display_data(
+                "display_data_bot_issues.json",
+                self.account_name,
+                "Play passes: " + str(play_passes),
+                int(available_balance),
             )
 
         except Exception as e:
