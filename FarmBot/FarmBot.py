@@ -283,13 +283,16 @@ class FarmBot:
             )
 
             add_account_to_display_data(
-                "display_data_bot_issues.json",
+                "display_data_success_accounts.json",
                 self.account_name,
                 "Play passes: " + str(play_passes),
                 int(available_balance),
             )
 
         except Exception as e:
+            add_account_to_display_data(
+                "display_data_bot_issues.json", self.account_name
+            )
             self.log.error(f"<r>⭕ {e} failed to login!</r>")
             self.log.error(f"<r>⭕ {self.display_name} failed to login!</r>")
             return None, None
