@@ -27,7 +27,8 @@ class Game:
             )
 
             if response is None:
-                self.log.error(f"<r>⭕ {self.account_name} failed to get game now!</r>")
+                self.log.error(
+                    f"<r>⭕ {self.account_name} failed to get game now!</r>")
                 return None
 
             return response.get("now")
@@ -43,7 +44,8 @@ class Game:
         )
 
         if response is None:
-            self.log.error(f"<r>⭕ {self.account_name} failed to get dogs drop!</r>")
+            self.log.error(
+                f"<r>⭕ {self.account_name} failed to get dogs drop!</r>")
             return False
 
         if "eligible" in response and response.get("eligible", False):
@@ -59,14 +61,16 @@ class Game:
             )
 
             if response is None:
-                self.log.error(f"<r>⭕ {self.account_name} failed to get balance!</r>")
+                self.log.error(
+                    f"<r>⭕ {self.account_name} failed to get balance!</r>")
                 return None
 
             if (
                 response.get("playPasses") is None
                 or response.get("availableBalance") is None
             ):
-                self.log.error(f"<r>⭕ {self.account_name} failed to get balance!</r>")
+                self.log.error(
+                    f"<r>⭕ {self.account_name} failed to get balance!</r>")
                 return None
 
             return response
@@ -148,7 +152,8 @@ class Game:
             )
 
             if response is None or "gameId" not in response:
-                self.log.error(f"<r>⭕ {self.account_name} failed to play game!</r>")
+                self.log.error(
+                    f"<r>⭕ {self.account_name} failed to play game!</r>")
                 return None
 
             return response
@@ -167,7 +172,8 @@ class Game:
             )
 
             if response is None:
-                self.log.error(f"<r>⭕ {self.account_name} failed to claim game!</r>")
+                self.log.error(
+                    f"<r>⭕ {self.account_name} failed to claim game!</r>")
                 return None
 
             return response
@@ -177,13 +183,13 @@ class Game:
             return
 
     def play_passes(self, games_count, drop_dogs=False):
-        return
+
         try:
             if games_count == 0:
                 return None
 
             games_count_to_play = random.randint(
-                min(6, games_count), min(games_count, 10)
+                min(8, games_count), min(games_count, 15)
             )
             self.log.info(
                 f"<g>🎮 We are playing <c>{games_count_to_play}</c> games of <c>{games_count}</c> your games for <c>{self.account_name}</c> ...</g>"
@@ -311,7 +317,8 @@ class Game:
             # wallet.get_balance()
             self.get_now()
 
-            available_balance = balance.get("availableBalance", 0).split(".")[0]
+            available_balance = balance.get(
+                "availableBalance", 0).split(".")[0]
             play_passes = balance.get("playPasses", 0)
             self.log.info(
                 f"<g>💰 Balance for <c>{self.account_name}</c>: Available balance: <c>{available_balance}Ḅ</c>, Play passes: <c>{play_passes}</c> 🎮</g>"
