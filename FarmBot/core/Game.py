@@ -243,6 +243,8 @@ class Game:
                     ),
                 )
 
+                points = points * 2  # TGE Event
+
                 post_data = {"game_id": gameId, "clover": points}
                 if dogs is not None:
                     post_data["clover"] = points - random.randint(10, 30)
